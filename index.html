@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WorkLog</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ── Themes ── */
+[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0f0f13;--bg2:#17171f;--bg3:#1e1e2a;--bg4:#252535;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--border3:rgba(255,255,255,0.18);
+  --text:#f0f0f8;--text2:#9999bb;--text3:#55556e;
+  --shadow:rgba(0,0,0,0.4);--subtask-bg:rgba(0,0,0,0.15);
+  --note-bg:#13131a;--note-border:rgba(255,255,255,0.09);
+}
+[data-theme="light"]{
+  color-scheme:light;
+  --bg:#f5f5f7;--bg2:#ffffff;--bg3:#ebebef;--bg4:#dddde4;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.13);--border3:rgba(0,0,0,0.2);
+  --text:#1a1a2e;--text2:#555570;--text3:#9999aa;
+  --shadow:rgba(0,0,0,0.1);--subtask-bg:rgba(0,0,0,0.02);
+  --note-bg:#f9f9fc;--note-border:rgba(0,0,0,0.08);
+}
+:root{
+  --accent:#7c6ef5;--accent2:#9d91f7;--accent-bg:rgba(124,110,245,0.12);
+  --green:#22c977;--green-bg:rgba(34,201,119,0.1);
+  --amber:#f5a623;--amber-bg:rgba(245,166,35,0.1);
+  --red:#f56565;--red-bg:rgba(245,101,101,0.1);
+  --radius:12px;--radius-sm:8px;--radius-xs:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;user-select:none;transition:background .2s,color .2s;}
+svg{display:block;}
+
+/* ── Titlebar ── */
+.titlebar{height:48px;-webkit-app-region:drag;flex-shrink:0;display:flex;align-items:center;padding:0 14px 0 80px;border-bottom:1px solid var(--border);background:var(--bg);gap:10px;}
+.titlebar-name{font-size:13px;font-weight:600;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;}
+.titlebar-sep{width:1px;height:14px;background:var(--border2);}
+.titlebar-date{font-size:12px;color:var(--text3);}
+.titlebar-nav{display:flex;gap:4px;margin-left:auto;-webkit-app-region:no-drag;align-items:center;}
+.tab-btn{padding:5px 14px;border-radius:20px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;background:transparent;color:var(--text3);}
+.tab-btn:hover{color:var(--text2);background:var(--bg3);}
+.tab-btn.active{background:var(--accent-bg);color:var(--accent2);}
+
+/* Theme toggle */
+.theme-toggle{width:32px;height:32px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-left:4px;-webkit-app-region:no-drag;}
+.theme-toggle:hover{background:var(--bg3);color:var(--text);}
+
+/* ── Layout ── */
+.layout{display:flex;flex:1;overflow:hidden;}
+
+/* ── Sidebar ── */
+.sidebar{width:232px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg);}
+.sidebar-section{padding:14px 14px 6px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;}
+.client-list{flex:1;overflow-y:auto;padding:4px 8px;}
+.client-list::-webkit-scrollbar{width:3px;}
+.client-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+.client-item{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;margin-bottom:2px;}
+.client-item:hover{background:var(--bg3);}
+.client-item.active{background:var(--accent-bg);}
+.client-avatar{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.client-name{font-size:13px;font-weight:500;color:var(--text);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.client-item.active .client-name{color:var(--accent2);}
+.client-badge{font-size:11px;color:var(--text3);background:var(--bg4);padding:2px 7px;border-radius:10px;}
+.add-client-btn{margin:6px 8px;padding:8px 12px;border-radius:var(--radius-sm);border:1px dashed var(--border2);background:transparent;color:var(--text3);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px;-webkit-app-region:no-drag;}
+.add-client-btn:hover{border-color:var(--accent);color:var(--accent2);background:var(--accent-bg);}
+.sidebar-bottom{border-top:1px solid var(--border);padding:14px;}
+.sidebar-total-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.sidebar-total-time{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;color:var(--text);letter-spacing:.02em;}
+.sidebar-total-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.main-header{padding:16px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px;}
+.main-client-name{font-size:18px;font-weight:600;color:var(--text);}
+.main-client-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+.header-actions{display:flex;gap:7px;flex-shrink:0;}
+
+/* Search + filter bar */
+.search-bar{padding:10px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;background:var(--bg);}
+.search-input-wrap{flex:1;position:relative;}
+.search-input-wrap svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text3);}
+.search-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px 7px 30px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:border-color .15s;}
+.search-input::placeholder{color:var(--text3);}
+.search-input:focus{border-color:var(--accent);}
+.filter-btns{display:flex;gap:4px;}
+.filter-btn{padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.filter-btn:hover{color:var(--text2);border-color:var(--border2);}
+.filter-btn.active{background:var(--accent-bg);color:var(--accent2);border-color:rgba(124,110,245,.3);}
+
+/* ── Buttons ── */
+.btn{padding:7px 15px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;-webkit-app-region:no-drag;display:flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--bg4);color:var(--text);}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(245,101,101,.2);}
+.btn-danger:hover{background:rgba(245,101,101,.2);}
+.btn-sm{padding:5px 11px;font-size:12px;}
+
+/* ── Task area ── */
+.task-area{flex:1;overflow-y:auto;padding:16px 22px;}
+.task-area::-webkit-scrollbar{width:3px;}
+.task-area::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+.center-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text3);}
+.center-icon{font-size:44px;opacity:.2;}
+.center-title{font-size:15px;color:var(--text2);font-weight:500;}
+.center-sub{font-size:13px;}
+
+/* ── Task card ── */
+.task-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;transition:border-color .2s,opacity .2s;}
+.task-card.running{border-color:rgba(124,110,245,.4);}
+.task-card.paused{border-color:rgba(245,166,35,.3);}
+.task-card.stopped{opacity:.82;}
+.task-header{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;}
+.task-status-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:all .2s;}
+.task-card.running .task-status-dot{background:var(--accent);box-shadow:0 0 8px rgba(124,110,245,.7);}
+.task-card.paused .task-status-dot{background:var(--amber);}
+.task-card.stopped .task-status-dot{background:var(--green);}
+.task-name-wrap{flex:1;min-width:0;}
+.task-name{font-size:14px;font-weight:500;color:var(--text);}
+.task-meta{display:flex;align-items:center;gap:8px;margin-top:3px;}
+.task-sub-label{font-size:11px;color:var(--text3);}
+
+/* Completion bar */
+.comp-bar-wrap{flex:1;max-width:80px;height:3px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.comp-bar-fill{height:3px;background:var(--green);border-radius:3px;transition:width .3s;}
+
+.task-timer{font-family:'DM Mono',monospace;font-size:17px;font-weight:500;color:var(--text2);min-width:76px;text-align:right;cursor:pointer;padding:3px 6px;border-radius:5px;transition:background .15s;}
+.task-timer:hover{background:var(--bg3);color:var(--text);}
+.task-card.running .task-timer{color:var(--accent2);}
+.task-card.paused .task-timer{color:var(--amber);}
+.task-card.stopped .task-timer{color:var(--green);}
+.task-controls{display:flex;gap:5px;-webkit-app-region:no-drag;}
+.ctrl-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;}
+.ctrl-btn:hover{background:var(--bg4);color:var(--text);border-color:var(--border2);}
+.ctrl-btn.play{border-color:rgba(124,110,245,.35);color:var(--accent2);}
+.ctrl-btn.play:hover{background:var(--accent-bg);}
+.ctrl-btn.pause-btn{border-color:rgba(245,166,35,.3);color:var(--amber);}
+.ctrl-btn.pause-btn:hover{background:var(--amber-bg);}
+.ctrl-btn.stop-btn{border-color:rgba(245,101,101,.3);color:var(--red);}
+.ctrl-btn.stop-btn:hover{background:var(--red-bg);}
+.ctrl-btn.note-btn{color:var(--text3);}
+.ctrl-btn.note-btn.has-note{color:var(--accent2);border-color:rgba(124,110,245,.3);}
+.ctrl-btn.note-btn:hover{color:var(--accent2);}
+.ctrl-btn.del-btn:hover{color:var(--red);border-color:rgba(245,101,101,.3);background:var(--red-bg);}
+.expand-btn{width:22px;height:22px;border-radius:5px;border:none;background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.expand-btn svg{transition:transform .2s;}
+.expand-btn.open svg{transform:rotate(90deg);}
+
+/* ── Note panel ── */
+.note-panel{border-top:1px solid var(--note-border);background:var(--note-bg);padding:10px 14px;}
+.note-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.note-panel-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;}
+.note-save-btn{font-size:11px;padding:3px 10px;border-radius:5px;border:none;background:var(--accent-bg);color:var(--accent2);font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .15s;}
+.note-save-btn:hover{background:var(--accent);color:#fff;}
+.note-textarea{width:100%;background:transparent;border:none;outline:none;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text2);resize:none;min-height:72px;line-height:1.6;-webkit-user-select:text;user-select:text;}
+.note-textarea::placeholder{color:var(--text3);}
+
+/* ── Subtasks ── */
+.subtasks-wrap{border-top:1px solid var(--border);background:var(--subtask-bg);}
+.subtask-item{display:flex;align-items:center;gap:9px;padding:8px 14px 8px 28px;border-bottom:1px solid var(--border);}
+.subtask-item:last-child{border-bottom:none;}
+.sub-dot{width:5px;height:5px;border-radius:50%;background:var(--text3);flex-shrink:0;}
+.subtask-item.running .sub-dot{background:var(--green);box-shadow:0 0 5px rgba(34,201,119,.5);}
+.subtask-item.paused .sub-dot{background:var(--amber);}
+.subtask-item.stopped .sub-dot{background:var(--green);opacity:.6;}
+.sub-name{flex:1;font-size:13px;color:var(--text2);}
+.subtask-item.running .sub-name{color:var(--text);}
+.sub-timer{font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);min-width:58px;text-align:right;cursor:pointer;padding:2px 5px;border-radius:4px;transition:background .15s;}
+.sub-timer:hover{background:var(--bg3);}
+.subtask-item.running .sub-timer{color:var(--green);}
+.subtask-item.paused .sub-timer{color:var(--amber);}
+.subtask-item.stopped .sub-timer{color:var(--green);opacity:.7;}
+.sub-controls{display:flex;gap:4px;}
+.sub-ctrl{width:22px;height:22px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.sub-ctrl:hover{background:var(--bg3);}
+.sub-ctrl.splay{color:var(--green);border-color:rgba(34,201,119,.3);}
+.sub-ctrl.splay:hover{background:var(--green-bg);}
+.sub-ctrl.spause{color:var(--amber);border-color:rgba(245,166,35,.3);}
+.sub-ctrl.spause:hover{background:var(--amber-bg);}
+.sub-ctrl.sstop{color:var(--red);border-color:rgba(245,101,101,.3);}
+.sub-ctrl.sstop:hover{background:var(--red-bg);}
+.sub-ctrl.snote{color:var(--text3);}
+.sub-ctrl.snote.has-note{color:var(--accent2);border-color:rgba(124,110,245,.3);}
+.sub-ctrl.sdel:hover{color:var(--red);border-color:rgba(245,101,101,.3);background:var(--red-bg);}
+
+/* Sub note panel */
+.sub-note-panel{border-top:1px solid var(--note-border);background:var(--note-bg);padding:8px 14px 8px 28px;}
+.sub-note-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.sub-note-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;}
+.sub-note-ta{width:100%;background:transparent;border:none;outline:none;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text2);resize:none;min-height:56px;line-height:1.6;-webkit-user-select:text;user-select:text;}
+.sub-note-ta::placeholder{color:var(--text3);}
+
+.add-sub-row{display:flex;gap:7px;padding:9px 14px 9px 28px;}
+.add-sub-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-xs);padding:6px 10px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:border-color .15s;-webkit-user-select:text;user-select:text;}
+.add-sub-input::placeholder{color:var(--text3);}
+.add-sub-input:focus{border-color:var(--accent);}
+.add-sub-go{padding:6px 11px;border-radius:var(--radius-xs);border:none;background:var(--accent-bg);color:var(--accent2);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .15s;}
+.add-sub-go:hover{background:var(--accent);color:#fff;}
+
+/* ── Floating timer ── */
+.float-timer{position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid rgba(124,110,245,.5);border-radius:14px;padding:11px 15px;display:flex;align-items:center;gap:11px;z-index:200;min-width:210px;box-shadow:0 8px 32px var(--shadow);transition:opacity .2s,transform .2s;}
+.float-timer.hidden{opacity:0;pointer-events:none;transform:translateY(10px);}
+.float-pulse{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.float-info{flex:1;min-width:0;}
+.float-task-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.float-client{font-size:11px;color:var(--text3);margin-top:1px;}
+.float-time{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:var(--accent2);}
+.float-btn{width:24px;height:24px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.float-btn:hover{background:var(--bg4);}
+
+/* ── Summary & History ── */
+.history-area,.summary-area{flex:1;overflow-y:auto;padding:16px 22px;}
+.history-area::-webkit-scrollbar,.summary-area::-webkit-scrollbar{width:3px;}
+.history-area::-webkit-scrollbar-thumb,.summary-area::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+.history-day{margin-bottom:22px;}
+.history-day-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.history-day-label{font-size:13px;font-weight:600;color:var(--text);}
+.history-day-total{font-family:'DM Mono',monospace;font-size:13px;color:var(--text2);}
+.history-task-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:5px;}
+.h-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.h-task-name{flex:1;font-size:13px;color:var(--text);}
+.h-client-name{font-size:11px;color:var(--text3);}
+.h-task-time{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--text2);}
+.summary-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.date-nav{display:flex;align-items:center;gap:10px;}
+.date-nav-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.date-nav-btn:hover:not(:disabled){background:var(--bg4);color:var(--text);}
+.date-nav-btn:disabled{opacity:.3;cursor:default;}
+.date-nav-label{font-size:14px;font-weight:600;color:var(--text);min-width:200px;text-align:center;}
+.sum-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px;}
+.metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;}
+.metric-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
+.metric-val{font-size:22px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace;}
+.sum-section-title{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
+.sum-task-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;}
+.sum-task-row{display:flex;align-items:center;gap:10px;padding:10px 14px;}
+.sum-badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;flex-shrink:0;}
+.sum-task-name{flex:1;font-size:13px;color:var(--text);}
+.sum-bar-wrap{width:80px;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.sum-bar-fill{height:5px;border-radius:3px;}
+.sum-task-time{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--text2);min-width:56px;text-align:right;}
+.sum-sub-row{display:flex;align-items:center;gap:10px;padding:6px 14px 6px 28px;border-top:1px solid var(--border);}
+.sum-sub-name{flex:1;font-size:12px;color:var(--text3);}
+.sum-sub-time{font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);min-width:56px;text-align:right;}
+
+/* ── Modals ── */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:300;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-backdrop.open{opacity:1;pointer-events:all;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:22px;width:380px;transform:scale(.96) translateY(8px);transition:transform .2s;}
+.modal-backdrop.open .modal{transform:scale(1) translateY(0);}
+.modal-title{font-size:15px;font-weight:600;margin-bottom:16px;color:var(--text);}
+.modal-field{margin-bottom:13px;}
+.modal-label{font-size:11px;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;}
+.modal-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 11px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:border-color .15s;-webkit-user-select:text;user-select:text;}
+.modal-input:focus{border-color:var(--accent);}
+.modal-input::placeholder{color:var(--text3);}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
+.color-row{display:flex;gap:7px;flex-wrap:wrap;}
+.color-swatch{width:22px;height:22px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:all .15s;}
+.color-swatch.selected{border-color:#fff;transform:scale(1.15);}
+[data-theme="light"] .color-swatch.selected{border-color:#333;}
+.time-row{display:flex;gap:8px;align-items:center;}
+.time-part{width:62px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;font-size:15px;font-family:'DM Mono',monospace;color:var(--text);outline:none;text-align:center;transition:border-color .15s;-webkit-user-select:text;user-select:text;}
+.time-part:focus{border-color:var(--accent);}
+.time-colon{color:var(--text3);font-size:18px;font-family:'DM Mono',monospace;}
+.modal-note{font-size:11px;color:var(--text3);margin-top:5px;}
+.confirm-modal{width:320px;}
+.del-warn{background:var(--red-bg);border:1px solid rgba(245,101,101,.2);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--red);margin-top:12px;}
+
+/* no-results */
+.no-results{text-align:center;padding:40px 0;color:var(--text3);font-size:14px;}
+/* note read view */
+.note-read{font-size:13px;color:var(--text2);line-height:1.65;white-space:pre-wrap;cursor:text;padding:2px 0;min-height:28px;}
+.note-read:hover{color:var(--text);}
+
+/* ── Toasts ── */
+.toast-container{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:400;display:flex;flex-direction:column-reverse;gap:8px;pointer-events:none;}
+.toast{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px;box-shadow:0 8px 24px var(--shadow);display:flex;align-items:center;gap:12px;min-width:240px;max-width:420px;pointer-events:all;animation:toastIn .25s ease-out;}
+.toast.leaving{opacity:0;transform:translateY(10px);transition:all .2s;}
+.toast-msg{font-size:13px;color:var(--text);flex:1;}
+.toast-action{background:var(--accent-bg);color:var(--accent2);border:none;padding:5px 11px;border-radius:5px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;}
+.toast-action:hover{background:var(--accent);color:#fff;}
+.toast-close{background:none;border:none;color:var(--text3);font-size:18px;line-height:1;cursor:pointer;padding:0 4px;transition:color .15s;}
+.toast-close:hover{color:var(--text);}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── Summary mode tabs ── */
+.mode-tabs{display:flex;gap:3px;background:var(--bg3);border-radius:8px;padding:3px;}
+.mode-tab{padding:5px 12px;border-radius:6px;border:none;background:transparent;color:var(--text3);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;}
+.mode-tab:hover{color:var(--text2);}
+.mode-tab.active{background:var(--bg);color:var(--text);box-shadow:0 1px 3px var(--shadow);}
+.date-range-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.date-range-row input[type="date"]{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:border-color .15s;}
+.date-range-row input[type="date"]:focus{border-color:var(--accent);}
+
+/* ── Modal selects ── */
+.modal-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 11px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:border-color .15s;cursor:pointer;}
+.modal-select:focus{border-color:var(--accent);}
+.modal-row{display:flex;gap:10px;margin-bottom:13px;}
+.modal-row > div{flex:1;}
+
+/* ── Modal delete btn ── */
+.modal-del{margin-right:auto;background:transparent;color:var(--red);border:none;padding:7px 0;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;}
+.modal-del:hover{text-decoration:underline;}
+
+/* ── History row controls ── */
+.history-task-row .ctrl-btn{width:24px;height:24px;}
+
+/* ── Keyboard hint ── */
+.kbd{display:inline-block;padding:1px 5px;border-radius:3px;background:var(--bg4);border:1px solid var(--border2);font-family:'DM Mono',monospace;font-size:10px;color:var(--text2);margin-left:4px;}
+
+/* ── Archived clients ── */
+.sidebar-archived-btn{margin-top:10px;background:transparent;border:none;color:var(--text3);font-family:'DM Sans',sans-serif;font-size:11px;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;-webkit-app-region:no-drag;}
+.sidebar-archived-btn:hover{color:var(--text2);text-decoration:underline;}
+.archived-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.archived-row:last-child{border-bottom:none;}
+.archived-empty{color:var(--text3);font-size:13px;padding:18px 0;text-align:center;}
+
+/* ── Locked timer ── */
+.task-timer.locked{cursor:default;opacity:.85;}
+.task-timer.locked:hover{background:transparent;color:var(--text2);}
+
+/* ── Billed styling ── */
+.task-card.billed{opacity:.72;border-color:rgba(34,201,119,.32);}
+.task-card.billed .task-name{color:var(--text2);}
+.billed-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:1px 7px;border-radius:10px;background:var(--green-bg);color:var(--green);font-weight:500;margin-left:8px;vertical-align:middle;letter-spacing:.02em;}
+.ctrl-btn.bill-btn{border-color:rgba(34,201,119,.3);color:var(--green);}
+.ctrl-btn.bill-btn:hover{background:var(--green-bg);}
+.ctrl-btn.bill-btn.on{background:var(--green-bg);}
+.billed-section-header{display:flex;align-items:center;gap:10px;padding:10px 14px;margin:18px 0 8px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;}
+.billed-section-header:hover{background:var(--bg3);}
+.billed-section-label{font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.08em;flex:1;}
+.billed-section-count{font-size:11px;color:var(--text3);}
+.billed-section-total{font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);margin-left:10px;}
+.billed-chevron{transition:transform .2s;color:var(--green);}
+.billed-chevron.open{transform:rotate(90deg);}
+.sidebar-unbilled{font-size:11px;color:var(--text3);margin-top:6px;}
+.sidebar-unbilled b{color:var(--amber);font-family:'DM Mono',monospace;font-weight:500;}
+
+/* ── History filter selects ── */
+.filter-select{padding:5px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:12px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;outline:none;transition:all .15s;}
+.filter-select:hover{border-color:var(--border2);color:var(--text);}
+.filter-select:focus{border-color:var(--accent);}
+.hist-date-range{display:flex;align-items:center;gap:6px;padding:8px 22px 4px;}
+.hist-date-range input[type="date"]{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;}
+</style>
+</head>
+<body>
+
+<!-- Titlebar -->
+<div class="titlebar">
+  <span class="titlebar-name">WorkLog</span>
+  <div class="titlebar-sep"></div>
+  <span class="titlebar-date" id="titlebar-date"></span>
+  <div class="titlebar-nav">
+    <button class="tab-btn active" id="tab-today" onclick="switchTab('today')">Today</button>
+    <button class="tab-btn" id="tab-summary" onclick="switchTab('summary')">Summary</button>
+    <button class="tab-btn" id="tab-history" onclick="switchTab('history')">History</button>
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">
+      <svg id="theme-icon-dark" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v1M7 12v1M1 7H2M12 7h1M2.93 2.93l.7.7M10.37 10.37l.7.7M2.93 11.07l.7-.7M10.37 3.63l.7-.7M9.5 7a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <svg id="theme-icon-light" width="14" height="14" viewBox="0 0 14 14" fill="none" style="display:none"><path d="M11.5 8.5A4.5 4.5 0 016 3c0-.3.02-.6.07-.88A5.5 5.5 0 1011.88 8.43c-.12.04-.25.07-.38.07z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-section">Clients</div>
+    <div class="client-list" id="client-list"></div>
+    <button class="add-client-btn" onclick="openAddClient()">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><line x1="6.5" y1="1" x2="6.5" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="1" y1="6.5" x2="12" y2="6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Add client
+    </button>
+    <div class="sidebar-bottom">
+      <div class="sidebar-total-label">Total today</div>
+      <div class="sidebar-total-time" id="total-today">00:00:00</div>
+      <div class="sidebar-total-sub" id="total-sub">0 tasks logged</div>
+      <div class="sidebar-unbilled" id="sidebar-unbilled" style="display:none">Unbilled: <b id="total-unbilled">00:00:00</b></div>
+      <button class="sidebar-archived-btn" id="sidebar-archived-btn" onclick="openArchivedModal()" style="display:none">View archived</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main" id="main-area">
+    <div class="center-state"><div class="center-icon">⏱</div><div class="center-title">Select or add a client</div><div class="center-sub">Tasks will appear here</div></div>
+  </div>
+</div>
+
+<!-- Floating timer -->
+<div class="float-timer hidden" id="float-timer">
+  <div class="float-pulse"></div>
+  <div class="float-info">
+    <div class="float-task-name" id="ft-name">—</div>
+    <div class="float-client" id="ft-client">—</div>
+  </div>
+  <div class="float-time" id="ft-time">00:00:00</div>
+  <div style="display:flex;gap:4px">
+    <button class="float-btn" onclick="floatPause()" title="Pause"><svg width="8" height="10" viewBox="0 0 8 10" fill="currentColor"><rect x="0" y="0" width="2.5" height="10" rx="1"/><rect x="5.5" y="0" width="2.5" height="10" rx="1"/></svg></button>
+    <button class="float-btn" onclick="floatStop()" title="Stop"><svg width="8" height="8" viewBox="0 0 8 8" fill="var(--red)"><rect width="8" height="8" rx="1.5"/></svg></button>
+  </div>
+</div>
+
+<!-- Modal: Client -->
+<div class="modal-backdrop" id="modal-client">
+  <div class="modal">
+    <div class="modal-title" id="mclient-title">New client</div>
+    <div class="modal-field"><div class="modal-label">Name</div><input class="modal-input" id="inp-cname" placeholder="e.g. Acme Corp" onkeydown="if(event.key==='Enter')saveClient()"/></div>
+    <div class="modal-field"><div class="modal-label">Colour</div><div class="color-row" id="color-row"></div></div>
+    <div class="modal-actions"><button class="modal-del" id="mclient-del" onclick="delClient()" style="display:none">Archive client</button><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-client')">Cancel</button><button class="btn btn-primary btn-sm" onclick="saveClient()">Save</button></div>
+  </div>
+</div>
+
+<!-- Modal: Task -->
+<div class="modal-backdrop" id="modal-task">
+  <div class="modal">
+    <div class="modal-title" id="mtask-title">New task</div>
+    <div class="modal-field"><div class="modal-label">Task name</div><input class="modal-input" id="inp-tname" placeholder="e.g. Homepage redesign" onkeydown="if(event.key==='Enter')saveTask()"/></div>
+    <div class="modal-row">
+      <div><div class="modal-label">Client</div><select class="modal-select" id="inp-tclient"></select></div>
+      <div><div class="modal-label">Date</div><input class="modal-input" id="inp-tdate" type="date"/></div>
+    </div>
+    <div class="modal-field" id="task-time-field">
+      <div class="modal-label">Manual time <span style="color:var(--text3);font-size:10px;text-transform:none;letter-spacing:0">(optional — if already done)</span></div>
+      <div class="time-row"><input class="time-part" id="inp-th" placeholder="00" type="number" min="0" max="23"/><span class="time-colon">:</span><input class="time-part" id="inp-tm" placeholder="00" type="number" min="0" max="59"/><span class="time-colon">:</span><input class="time-part" id="inp-ts" placeholder="00" type="number" min="0" max="59"/></div>
+      <div class="modal-note">Leave at 0 to use the live timer</div>
+    </div>
+    <div class="modal-note" id="task-time-locked" style="display:none;background:var(--bg3);padding:8px 11px;border-radius:var(--radius-sm);margin-bottom:13px">Time is calculated from subtasks. Delete all subtasks to edit the task timer directly.</div>
+    <div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-task')">Cancel</button><button class="btn btn-primary btn-sm" onclick="saveTask()">Save</button></div>
+  </div>
+</div>
+
+<!-- Modal: Archived clients -->
+<div class="modal-backdrop" id="modal-archived">
+  <div class="modal">
+    <div class="modal-title">Archived clients</div>
+    <div id="archived-list"></div>
+    <div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-archived')">Close</button></div>
+  </div>
+</div>
+
+<!-- Modal: Subtask -->
+<div class="modal-backdrop" id="modal-sub">
+  <div class="modal">
+    <div class="modal-title" id="msub-title">Edit subtask</div>
+    <div class="modal-field"><div class="modal-label">Subtask name</div><input class="modal-input" id="inp-sname" placeholder="e.g. Write copy" onkeydown="if(event.key==='Enter')saveSubtask()"/></div>
+    <div class="modal-field">
+      <div class="modal-label">Manual time <span style="color:var(--text3);font-size:10px;text-transform:none;letter-spacing:0">(optional)</span></div>
+      <div class="time-row"><input class="time-part" id="inp-sh" placeholder="00" type="number" min="0" max="23"/><span class="time-colon">:</span><input class="time-part" id="inp-sm" placeholder="00" type="number" min="0" max="59"/><span class="time-colon">:</span><input class="time-part" id="inp-ss" placeholder="00" type="number" min="0" max="59"/></div>
+      <div class="modal-note">Leave at 0 to use the live timer</div>
+    </div>
+    <div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-sub')">Cancel</button><button class="btn btn-primary btn-sm" onclick="saveSubtask()">Save</button></div>
+  </div>
+</div>
+
+<!-- Modal: Confirm -->
+<div class="modal-backdrop" id="modal-confirm">
+  <div class="modal confirm-modal">
+    <div class="modal-title" id="confirm-title">Delete?</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.6" id="confirm-msg"></div>
+    <div class="del-warn">This cannot be undone.</div>
+    <div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-confirm')">Cancel</button><button class="btn btn-danger btn-sm" id="confirm-ok">Delete</button></div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+const COLORS=['#7c6ef5','#3dd68c','#f5a623','#f56565','#63b3ed','#fc8181','#68d391','#f6ad55','#b794f4','#4fd1c5']
+const pad=n=>String(Math.max(0,n|0)).padStart(2,'0')
+const uid=()=>Math.random().toString(36).slice(2,10)
+function fmt(s){s=Math.max(0,s|0);return`${pad(s/3600|0)}:${pad((s%3600)/60|0)}:${pad(s%60)}`}
+function todayStr(){return new Date().toISOString().slice(0,10)}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function dateAdd(d,n){const x=new Date(d+'T12:00:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)}
+function dateLbl(d){return new Date(d+'T12:00:00').toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+function weekStart(d){const x=new Date(d+'T12:00:00');const dow=(x.getDay()+6)%7;x.setDate(x.getDate()-dow);return x.toISOString().slice(0,10)}
+function monthStart(d){return d.slice(0,7)+'-01'}
+function monthEnd(d){const [y,m]=d.split('-').map(Number);const last=new Date(y,m,0).getDate();return `${d.slice(0,7)}-${pad(last)}`}
+
+let S={clients:[],tasks:[],selClient:null,selColor:COLORS[0]}
+let curTab='today',sumStart=todayStr(),sumEnd=todayStr(),sumMode='day'
+let editClient=null,editTask=null,editSub=null,confirmCb=null,tickInt=null,autoSaveCounter=0
+let searchQ='',filterStatus='all',searchDebounce=null
+let histSearch='',histFilter='all',histClient='all',histDate='all',histStart='',histEnd=''
+let billedCollapsed=true
+
+// ── Persistence ──────────────────────────────────────────────
+async function load(){
+  try{
+    let d=null
+    if(window.electronAPI) d=await window.electronAPI.loadData()
+    else{const r=localStorage.getItem('wl4');if(r)d=JSON.parse(r)}
+    if(d){
+      S.clients=d.clients||[]
+      S.tasks=d.tasks||[]
+      S.theme=d.theme||'dark'
+      // If the gap between last save and now is > 10s, the app was closed — auto-pause any running timer
+      const gap=d.savedAt?(Date.now()-d.savedAt)/1000:Infinity
+      if(gap>10){
+        S.tasks.forEach(t=>{
+          if(t.state==='running'){t.state='paused';t.startedAt=null}
+          ;(t.subtasks||[]).forEach(s=>{if(s.state==='running'){s.state='paused';s.startedAt=null}})
+        })
+      }
+    }
+  }catch(e){}
+}
+function bankRunningInPlace(){
+  const now=Date.now()
+  S.tasks.forEach(t=>{
+    if(t.state==='running'&&t.startedAt){
+      t.elapsed=(t.elapsed||0)+Math.floor((now-t.startedAt)/1000)
+      t.startedAt=now
+    }
+    ;(t.subtasks||[]).forEach(s=>{
+      if(s.state==='running'&&s.startedAt){
+        s.elapsed=(s.elapsed||0)+Math.floor((now-s.startedAt)/1000)
+        s.startedAt=now
+      }
+    })
+  })
+}
+function save(){
+  bankRunningInPlace()
+  const d={clients:S.clients,tasks:S.tasks,theme:document.documentElement.getAttribute('data-theme'),savedAt:Date.now()}
+  if(window.electronAPI)window.electronAPI.saveData(d)
+  else{try{localStorage.setItem('wl4',JSON.stringify(d))}catch(e){}}
+}
+
+// ── Theme ────────────────────────────────────────────────────
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme')
+  const next=cur==='dark'?'light':'dark'
+  document.documentElement.setAttribute('data-theme',next)
+  document.getElementById('theme-icon-dark').style.display=next==='dark'?'block':'none'
+  document.getElementById('theme-icon-light').style.display=next==='light'?'block':'none'
+  save()
+}
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t||'dark')
+  document.getElementById('theme-icon-dark').style.display=(t||'dark')==='dark'?'block':'none'
+  document.getElementById('theme-icon-light').style.display=(t||'dark')==='light'?'block':'none'
+}
+
+// ── Timing helpers ───────────────────────────────────────────
+function elap(item){let b=item.elapsed||0;if(item.state==='running'&&item.startedAt)b+=Math.floor((Date.now()-item.startedAt)/1000);return Math.max(0,b)}
+function taskTotal(t){const subs=t.subtasks||[];if(subs.length>0)return subs.reduce((a,s)=>a+elap(s),0);return elap(t)}
+function rangeTotal(start,end){return S.tasks.filter(t=>t.date>=start&&t.date<=end).reduce((a,t)=>a+taskTotal(t),0)}
+function todayTotal(){return rangeTotal(todayStr(),todayStr())}
+function todayCount(){return S.tasks.filter(t=>t.date===todayStr()).length}
+function runningTask(){return S.tasks.find(t=>t.state==='running'||(t.subtasks||[]).some(s=>s.state==='running'))||null}
+function runningSub(){for(const t of S.tasks){for(const s of (t.subtasks||[]))if(s.state==='running')return{t,s}}return null}
+function initials(n){return n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}
+
+// Completion % for a task (stopped subtasks / total subtasks)
+function compPct(t){
+  const subs=t.subtasks||[]
+  if(!subs.length)return t.state==='stopped'?100:0
+  const done=subs.filter(s=>s.state==='stopped').length
+  return Math.round(done/subs.length*100)
+}
+
+// ── Tick ─────────────────────────────────────────────────────
+function startTick(){
+  if(tickInt)clearInterval(tickInt)
+  tickInt=setInterval(()=>{
+    // Only update timers for tasks that are actually running
+    S.tasks.forEach(t=>{
+      const taskRunning=t.state==='running'||(t.subtasks||[]).some(s=>s.state==='running')
+      if(taskRunning){
+        const el=document.getElementById('tt-'+t.id);if(el)el.textContent=fmt(taskTotal(t))
+      }
+      ;(t.subtasks||[]).forEach(s=>{
+        if(s.state==='running'){
+          const se=document.getElementById('st-'+s.id);if(se)se.textContent=fmt(elap(s))
+        }
+      })
+    })
+    const tot=document.getElementById('total-today');if(tot)tot.textContent=fmt(todayTotal())
+    const rt=runningTask(),ft=document.getElementById('float-timer')
+    if(rt){
+      ft.classList.remove('hidden')
+      document.getElementById('ft-name').textContent=rt.name
+      const c=S.clients.find(c=>c.id===rt.clientId)
+      document.getElementById('ft-client').textContent=c?c.name:''
+      document.getElementById('ft-time').textContent=fmt(taskTotal(rt))
+      if(window.electronAPI&&window.electronAPI.updateTray){
+        window.electronAPI.updateTray({name:rt.name,client:c?c.name:'',time:fmt(taskTotal(rt))})
+      }
+    } else {
+      ft.classList.add('hidden')
+      if(window.electronAPI&&window.electronAPI.updateTray)window.electronAPI.updateTray(null)
+    }
+    // Auto-save every 30s while something is running, to minimise data loss
+    autoSaveCounter++
+    if(rt&&autoSaveCounter>=30){autoSaveCounter=0;save()}
+  },1000)
+}
+
+// ── Task actions ─────────────────────────────────────────────
+function pauseAll(except=null){
+  const now=Date.now()
+  const affected=[]
+  S.tasks.forEach(t=>{
+    let touched=false
+    if(t.id!==except&&t.state==='running'){t.elapsed=(t.elapsed||0)+Math.floor((now-t.startedAt)/1000);t.startedAt=null;t.state='paused';touched=true}
+    ;(t.subtasks||[]).forEach(s=>{if(s.state==='running'){s.elapsed=(s.elapsed||0)+Math.floor((now-s.startedAt)/1000);s.startedAt=null;s.state='paused';touched=true}})
+    if(touched)affected.push(t)
+  })
+  return affected
+}
+function startTask(id){
+  const t=S.tasks.find(t=>t.id===id);if(!t)return
+  if((t.subtasks||[]).length>0)return  // managed via subtasks
+  const affected=pauseAll(id)
+  t.elapsed=t.elapsed||0;t.startedAt=Date.now();t.state='running';save();reRT(t)
+  affected.forEach(x=>{if(x.id!==t.id)reRT(x)})
+}
+function pauseTask(id){const t=S.tasks.find(t=>t.id===id);if(!t||t.state!=='running')return;t.elapsed=(t.elapsed||0)+Math.floor((Date.now()-t.startedAt)/1000);t.startedAt=null;t.state='paused';save();reRT(t)}
+function stopTask(id){const t=S.tasks.find(t=>t.id===id);if(!t)return;if(t.state==='running'){t.elapsed=(t.elapsed||0)+Math.floor((Date.now()-t.startedAt)/1000);t.startedAt=null}t.state='stopped';save();reRT(t)}
+function requestStopTask(id){
+  const t=S.tasks.find(t=>t.id===id);if(!t)return
+  const activeSubs=(t.subtasks||[]).filter(s=>s.state!=='stopped')
+  if(activeSubs.length===0){stopTask(id);return}
+  confirmCb=()=>{
+    const now=Date.now()
+    t.subtasks.forEach(s=>{
+      if(s.state==='running'){s.elapsed=(s.elapsed||0)+Math.floor((now-s.startedAt)/1000);s.startedAt=null}
+      s.state='stopped'
+    })
+    if(t.state==='running'){t.elapsed=(t.elapsed||0)+Math.floor((now-t.startedAt)/1000);t.startedAt=null}
+    t.state='stopped';save();closeModal('modal-confirm');reRT(t)
+  }
+  document.getElementById('confirm-title').textContent='Stop task and all subtasks?'
+  document.getElementById('confirm-msg').textContent=`This will stop ${activeSubs.length} subtask${activeSubs.length===1?'':'s'} and mark the task as complete.`
+  document.getElementById('confirm-ok').textContent='Stop all'
+  document.getElementById('confirm-ok').onclick=confirmCb
+  openModal('modal-confirm')
+}
+function delTask(id){
+  const idx=S.tasks.findIndex(t=>t.id===id);if(idx<0)return
+  const snapshot=S.tasks[idx]
+  S.tasks.splice(idx,1);save()
+  if(curTab==='today')renderMain()
+  else if(curTab==='summary')renderSummary()
+  else if(curTab==='history')renderHistory()
+  renderSidebar()
+  showToast(`Deleted "${snapshot.name}"`,'Undo',()=>{
+    S.tasks.splice(idx,0,snapshot);save()
+    if(curTab==='today')renderMain()
+    else if(curTab==='summary')renderSummary()
+    else if(curTab==='history')renderHistory()
+    renderSidebar()
+  })
+}
+function startSub(tid,sid){const t=S.tasks.find(t=>t.id===tid);const s=(t?.subtasks||[]).find(s=>s.id===sid);if(!s)return;const affected=pauseAll();s.elapsed=s.elapsed||0;s.startedAt=Date.now();s.state='running';save();reRT(t);affected.forEach(x=>{if(x.id!==t.id)reRT(x)})}
+function pauseSub(tid,sid){const t=S.tasks.find(t=>t.id===tid);const s=(t?.subtasks||[]).find(s=>s.id===sid);if(!s||s.state!=='running')return;s.elapsed=(s.elapsed||0)+Math.floor((Date.now()-s.startedAt)/1000);s.startedAt=null;s.state='paused';save();reRS(t,s)}
+function stopSub(tid,sid){const t=S.tasks.find(t=>t.id===tid);const s=(t?.subtasks||[]).find(s=>s.id===sid);if(!s)return;if(s.state==='running'){s.elapsed=(s.elapsed||0)+Math.floor((Date.now()-s.startedAt)/1000);s.startedAt=null}s.state='stopped';save();reRS(t,s)}
+function delSub(tid,sid){
+  const t=S.tasks.find(t=>t.id===tid);if(!t)return
+  const idx=(t.subtasks||[]).findIndex(s=>s.id===sid);if(idx<0)return
+  const snapshot=t.subtasks[idx]
+  t.subtasks.splice(idx,1);save();reRT(t)
+  showToast(`Deleted "${snapshot.name}"`,'Undo',()=>{
+    if(!t.subtasks)t.subtasks=[]
+    t.subtasks.splice(idx,0,snapshot);save();reRT(t)
+  })
+}
+function addSub(tid){
+  const inp=document.getElementById('si-'+tid);const name=inp?.value?.trim();if(!name)return
+  const t=S.tasks.find(t=>t.id===tid);if(!t)return
+  if(!t.subtasks)t.subtasks=[]
+  // If this is the first subtask and main task timer was running, bank its time
+  if(t.subtasks.length===0&&t.state==='running'){
+    t.elapsed=(t.elapsed||0)+Math.floor((Date.now()-t.startedAt)/1000)
+    t.startedAt=null;t.state='paused'
+  }
+  t.subtasks.push({id:uid(),name,state:'idle',elapsed:0,startedAt:null,note:''})
+  inp.value='';save();reRT(t)
+}
+function floatPause(){const rs=runningSub();if(rs){pauseSub(rs.t.id,rs.s.id);return}const rt=runningTask();if(rt)pauseTask(rt.id)}
+function floatStop(){const rs=runningSub();if(rs){stopSub(rs.t.id,rs.s.id);return}const rt=runningTask();if(rt)stopTask(rt.id)}
+
+// ── Billed ────────────────────────────────────────────────────
+function toggleBilled(id){
+  const t=S.tasks.find(t=>t.id===id);if(!t)return
+  if(t.state!=='stopped')return
+  t.billed=!t.billed
+  t.billedAt=t.billed?Date.now():null
+  save()
+  if(curTab==='today')renderTaskList()
+  else if(curTab==='history')renderHistory()
+  else if(curTab==='summary')renderSummary()
+  renderSidebar()
+  showToast(t.billed?`Marked "${t.name}" as billed`:`Marked "${t.name}" as unbilled`)
+}
+function toggleBilledSection(){billedCollapsed=!billedCollapsed;renderTaskList()}
+
+// ── Notes ────────────────────────────────────────────────────
+function toggleNote(id){
+  const t=S.tasks.find(t=>t.id===id);if(!t)return
+  t._noteOpen=!t._noteOpen
+  if(t._noteOpen) t._noteEdit=!t.note  // edit mode if no note yet, read mode if note exists
+  reRT(t)
+}
+function editNote(id){
+  const t=S.tasks.find(t=>t.id===id);if(!t)return
+  t._noteEdit=true;reRT(t)
+  setTimeout(()=>{const ta=document.getElementById('note-ta-'+id);if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)}},50)
+}
+function saveNote(id){
+  const t=S.tasks.find(t=>t.id===id);if(!t)return
+  const ta=document.getElementById('note-ta-'+id);if(!ta)return
+  t.note=ta.value.trim();t._noteEdit=false
+  if(!t.note) t._noteOpen=false  // collapse if cleared
+  save();reRT(t)
+}
+function deleteNote(id){
+  const t=S.tasks.find(t=>t.id===id);if(!t)return
+  t.note='';t._noteOpen=false;t._noteEdit=false;save();reRT(t)
+}
+function toggleSubNote(tid,sid){
+  const t=S.tasks.find(t=>t.id===tid);const s=(t?.subtasks||[]).find(s=>s.id===sid);if(!s)return
+  s._noteOpen=!s._noteOpen
+  if(s._noteOpen) s._noteEdit=!s.note
+  reRS(t,s)
+}
+function editSubNote(tid,sid){
+  const t=S.tasks.find(t=>t.id===tid);const s=(t?.subtasks||[]).find(s=>s.id===sid);if(!s)return
+  s._noteEdit=true;reRS(t,s)
+  setTimeout(()=>{const ta=document.getElementById('snote-ta-'+sid);if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)}},50)
+}
+function saveSubNote(tid,sid){
+  const t=S.tasks.find(t=>t.id===tid);const s=(t?.subtasks||[]).find(s=>s.id===sid);if(!s)return
+  const ta=document.getElementById('snote-ta-'+sid);if(!ta)return
+  s.note=ta.value.trim();s._noteEdit=false
+  if(!s.note) s._noteOpen=false
+  save();reRS(t,s)
+}
+function deleteSubNote(tid,sid){
+  const t=S.tasks.find(t=>t.id===tid);const s=(t?.subtasks||[]).find(s=>s.id===sid);if(!s)return
+  s.note='';s._noteOpen=false;s._noteEdit=false;save();reRS(t,s)
+}
+
+// ── Toast ─────────────────────────────────────────────────────
+function showToast(msg,actionLabel,onAction){
+  const container=document.getElementById('toast-container');if(!container)return
+  const id='t'+uid()
+  const el=document.createElement('div')
+  el.className='toast';el.id=id
+  el.innerHTML=`<span class="toast-msg">${esc(msg)}</span>${actionLabel?`<button class="toast-action" id="${id}-act">${esc(actionLabel)}</button>`:''}<button class="toast-close" id="${id}-x">×</button>`
+  container.appendChild(el)
+  const dismiss=()=>{el.classList.add('leaving');setTimeout(()=>el.remove(),200)}
+  const timer=setTimeout(dismiss,5000)
+  if(actionLabel){
+    document.getElementById(id+'-act').onclick=()=>{clearTimeout(timer);dismiss();if(onAction)onAction()}
+  }
+  document.getElementById(id+'-x').onclick=()=>{clearTimeout(timer);dismiss()}
+}
+
+// ── Modals: client ───────────────────────────────────────────
+function openAddClient(){editClient=null;document.getElementById('mclient-title').textContent='New client';document.getElementById('inp-cname').value='';document.getElementById('mclient-del').style.display='none';S.selColor=COLORS[0];renderColors();openModal('modal-client');setTimeout(()=>document.getElementById('inp-cname').focus(),120)}
+function openEditClient(id){editClient=id;const c=S.clients.find(c=>c.id===id);if(!c)return;document.getElementById('mclient-title').textContent='Edit client';document.getElementById('inp-cname').value=c.name;document.getElementById('mclient-del').style.display='inline-block';S.selColor=c.color;renderColors();openModal('modal-client');setTimeout(()=>document.getElementById('inp-cname').focus(),120)}
+function renderColors(){document.getElementById('color-row').innerHTML=COLORS.map(c=>`<div class="color-swatch${c===S.selColor?' selected':''}" style="background:${c}" data-color="${c}" onclick="pickColor('${c}')"></div>`).join('')}
+function pickColor(c){S.selColor=c;document.querySelectorAll('.color-swatch').forEach(el=>el.classList.toggle('selected',el.dataset.color===c))}
+function saveClient(){const name=document.getElementById('inp-cname').value.trim();if(!name)return;if(editClient){const c=S.clients.find(c=>c.id===editClient);if(c){c.name=name;c.color=S.selColor}}else{const c={id:uid(),name,color:S.selColor};S.clients.push(c);S.selClient=c.id}save();closeModal('modal-client');renderSidebar();renderMain()}
+function delClient(){
+  if(!editClient)return
+  const c=S.clients.find(c=>c.id===editClient);if(!c)return
+  const cid=editClient
+  const tasksOfClient=S.tasks.filter(t=>t.clientId===cid)
+  confirmCb=()=>{
+    // Soft delete: mark archived, keep tasks intact so history stays visible
+    c.archived=true
+    // Pause any still-running timers under this client
+    const now=Date.now()
+    tasksOfClient.forEach(t=>{
+      if(t.state==='running'){t.elapsed=(t.elapsed||0)+Math.floor((now-t.startedAt)/1000);t.startedAt=null;t.state='paused'}
+      ;(t.subtasks||[]).forEach(s=>{if(s.state==='running'){s.elapsed=(s.elapsed||0)+Math.floor((now-s.startedAt)/1000);s.startedAt=null;s.state='paused'}})
+    })
+    if(S.selClient===cid)S.selClient=S.clients.find(x=>!x.archived)?.id||null
+    save();closeModal('modal-confirm');closeModal('modal-client');renderSidebar();renderMain()
+    if(curTab==='history')renderHistory()
+    if(curTab==='summary')renderSummary()
+    showToast(`Archived "${c.name}"`,'Undo',()=>{
+      c.archived=false
+      save();renderSidebar();renderMain()
+      if(curTab==='history')renderHistory()
+      if(curTab==='summary')renderSummary()
+    })
+  }
+  document.getElementById('confirm-title').textContent='Archive client?'
+  document.getElementById('confirm-msg').textContent=`"${c.name}" will be hidden from the sidebar. Its ${tasksOfClient.length} task${tasksOfClient.length===1?'':'s'} stay visible in history and summary. You can restore it from "View archived".`
+  document.getElementById('confirm-ok').textContent='Archive'
+  document.getElementById('confirm-ok').onclick=confirmCb
+  openModal('modal-confirm')
+}
+
+// ── Archived clients ──────────────────────────────────────────
+function openArchivedModal(){renderArchivedList();openModal('modal-archived')}
+function renderArchivedList(){
+  const list=S.clients.filter(c=>c.archived)
+  const el=document.getElementById('archived-list')
+  if(!list.length){el.innerHTML='<div class="archived-empty">No archived clients</div>';return}
+  el.innerHTML=list.map(c=>{
+    const n=S.tasks.filter(t=>t.clientId===c.id).length
+    return`<div class="archived-row">
+      <div class="client-avatar" style="background:${c.color}22;color:${c.color}">${esc(initials(c.name))}</div>
+      <div style="flex:1;min-width:0"><div style="font-size:13px;color:var(--text)">${esc(c.name)}</div><div style="font-size:11px;color:var(--text3)">${n} task${n===1?'':'s'}</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="restoreClient('${c.id}')">Restore</button>
+    </div>`
+  }).join('')
+}
+function restoreClient(id){
+  const c=S.clients.find(x=>x.id===id);if(!c)return
+  c.archived=false
+  if(!S.selClient)S.selClient=id
+  save();renderSidebar();renderArchivedList()
+  if(curTab==='today')renderMain()
+  else if(curTab==='history')renderHistory()
+  else if(curTab==='summary')renderSummary()
+  showToast(`Restored "${c.name}"`)
+}
+
+// ── Modals: task ─────────────────────────────────────────────
+function renderTaskClientOptions(selId){
+  // Include all non-archived clients, plus the currently selected client even if archived
+  // (so editing an existing task whose client got archived still shows its client).
+  const list=S.clients.filter(c=>!c.archived||c.id===selId)
+  return list.map(c=>`<option value="${esc(c.id)}"${c.id===selId?' selected':''}>${esc(c.name)}${c.archived?' (archived)':''}</option>`).join('')
+}
+function setTaskTimeFieldVisible(show){
+  document.getElementById('task-time-field').style.display=show?'block':'none'
+  document.getElementById('task-time-locked').style.display=show?'none':'block'
+}
+function openAddTask(){
+  editTask=null
+  document.getElementById('mtask-title').textContent='New task'
+  document.getElementById('inp-tname').value=''
+  document.getElementById('inp-th').value=''
+  document.getElementById('inp-tm').value=''
+  document.getElementById('inp-ts').value=''
+  document.getElementById('inp-tdate').value=todayStr()
+  document.getElementById('inp-tclient').innerHTML=renderTaskClientOptions(S.selClient)
+  setTaskTimeFieldVisible(true)
+  openModal('modal-task');setTimeout(()=>document.getElementById('inp-tname').focus(),120)
+}
+function openEditTask(id){
+  editTask=id
+  const t=S.tasks.find(t=>t.id===id);if(!t)return
+  const hasSubs=(t.subtasks||[]).length>0
+  document.getElementById('mtask-title').textContent='Edit task'
+  document.getElementById('inp-tname').value=t.name
+  const e=taskTotal(t)
+  document.getElementById('inp-th').value=(e/3600|0)||''
+  document.getElementById('inp-tm').value=((e%3600)/60|0)||''
+  document.getElementById('inp-ts').value=(e%60)||''
+  document.getElementById('inp-tdate').value=t.date||todayStr()
+  document.getElementById('inp-tclient').innerHTML=renderTaskClientOptions(t.clientId)
+  setTaskTimeFieldVisible(!hasSubs)
+  openModal('modal-task');setTimeout(()=>document.getElementById('inp-tname').focus(),120)
+}
+function saveTask(){
+  const name=document.getElementById('inp-tname').value.trim();if(!name)return
+  const h=parseInt(document.getElementById('inp-th').value)||0,m=parseInt(document.getElementById('inp-tm').value)||0,s2=parseInt(document.getElementById('inp-ts').value)||0
+  const manual=h*3600+m*60+s2
+  const cid=document.getElementById('inp-tclient').value||S.selClient
+  const date=document.getElementById('inp-tdate').value||todayStr()
+  if(editTask){
+    const t=S.tasks.find(t=>t.id===editTask);if(!t)return
+    t.name=name;t.clientId=cid;t.date=date
+    const hasSubs=(t.subtasks||[]).length>0
+    if(manual>0&&!hasSubs){if(t.state==='running')t.startedAt=null;t.elapsed=manual;t.state='stopped'}
+  } else {
+    const t={id:uid(),name,clientId:cid,date,state:manual>0?'stopped':'idle',elapsed:manual,startedAt:null,subtasks:[],note:'',_exp:true,_noteOpen:false}
+    S.tasks.push(t)
+  }
+  save();closeModal('modal-task');renderSidebar()
+  if(curTab==='today')renderMain()
+  else if(curTab==='summary')renderSummary()
+  else if(curTab==='history')renderHistory()
+}
+
+// ── Modals: subtask ──────────────────────────────────────────
+function openEditSub(tid,sid){editSub={tid,sid};const t=S.tasks.find(t=>t.id===tid);const s=(t?.subtasks||[]).find(s=>s.id===sid);if(!s)return;document.getElementById('msub-title').textContent='Edit subtask';document.getElementById('inp-sname').value=s.name;const e=elap(s);document.getElementById('inp-sh').value=(e/3600|0)||'';document.getElementById('inp-sm').value=((e%3600)/60|0)||'';document.getElementById('inp-ss').value=(e%60)||'';openModal('modal-sub');setTimeout(()=>document.getElementById('inp-sname').focus(),120)}
+function saveSubtask(){
+  if(!editSub)return;const{tid,sid}=editSub
+  const t=S.tasks.find(t=>t.id===tid);const s=(t?.subtasks||[]).find(s=>s.id===sid);if(!s)return
+  const name=document.getElementById('inp-sname').value.trim();if(!name)return
+  const h=parseInt(document.getElementById('inp-sh').value)||0,m=parseInt(document.getElementById('inp-sm').value)||0,s2=parseInt(document.getElementById('inp-ss').value)||0
+  const manual=h*3600+m*60+s2
+  s.name=name;if(manual>0){if(s.state==='running')s.startedAt=null;s.elapsed=manual;s.state='stopped'}
+  save();closeModal('modal-sub');reRT(t)
+}
+
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal-backdrop').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open')}))
+
+// ── SVG icons ────────────────────────────────────────────────
+const iPlay=`<svg width="9" height="11" viewBox="0 0 9 11" fill="currentColor"><path d="M0 0L9 5.5L0 11V0Z"/></svg>`
+const iPause=`<svg width="9" height="11" viewBox="0 0 9 11" fill="currentColor"><rect x="0" y="0" width="3" height="11" rx="1"/><rect x="6" y="0" width="3" height="11" rx="1"/></svg>`
+const iStop=`<svg width="9" height="9" viewBox="0 0 9 9" fill="currentColor"><rect width="9" height="9" rx="2"/></svg>`
+const iEdit=`<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M8.5 1.5l2 2L4 10H2v-2L8.5 1.5z"/></svg>`
+const iDel=`<svg width="11" height="12" viewBox="0 0 11 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><polyline points="1,2.5 10,2.5"/><path d="M2.5 2.5V10.5a1 1 0 001 1h4a1 1 0 001-1V2.5"/><line x1="4.5" y1="5" x2="4.5" y2="9"/><line x1="6.5" y1="5" x2="6.5" y2="9"/><path d="M3.5 2.5V1.5h4v1"/></svg>`
+const iNote=`<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="1.5" y="1.5" width="9" height="9" rx="1.5"/><line x1="3.5" y1="4" x2="8.5" y2="4"/><line x1="3.5" y1="6.5" x2="8.5" y2="6.5"/><line x1="3.5" y1="9" x2="6" y2="9"/></svg>`
+const iBill=`<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 1v9"/><path d="M8 3.2H4.5a1.3 1.3 0 000 2.6h2a1.3 1.3 0 010 2.6H3"/></svg>`
+const iCheck=`<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5.5 4.5,8.5 9.5,2.5"/></svg>`
+
+// ── Render: task card ─────────────────────────────────────────
+function renderTaskCard(t){
+  const subs=t.subtasks||[],exp=t._exp!==false
+  const runSubs=subs.filter(s=>s.state==='running').length
+  const subLabel=subs.length?`${subs.length} subtask${subs.length>1?'s':''}${runSubs?` · ${runSubs} running`:''}`:'No subtasks'
+  const cls=(t.state==='running'?' running':t.state==='paused'?' paused':t.state==='stopped'?' stopped':'')+(t.billed?' billed':'')
+  const pct=compPct(t)
+  const hasNote=!!(t.note&&t.note.trim())
+
+  return`<div class="task-card${cls}" id="tc-${t.id}">
+    <div class="task-header" onclick="toggleExp('${t.id}')">
+      <div class="task-status-dot"></div>
+      <div class="task-name-wrap">
+        <div class="task-name">${esc(t.name)}${t.billed?`<span class="billed-badge">${iCheck} Billed</span>`:''}</div>
+        <div class="task-meta">
+          <span class="task-sub-label">${subLabel}</span>
+          ${subs.length>0?`<div class="comp-bar-wrap"><div class="comp-bar-fill" style="width:${pct}%"></div></div><span style="font-size:10px;color:var(--text3)">${pct}%</span>`:''}
+        </div>
+      </div>
+      ${subs.length>0
+        ? `<div class="task-timer locked" id="tt-${t.id}" title="Calculated from subtasks — delete all subtasks to edit">${fmt(taskTotal(t))}</div>`
+        : `<div class="task-timer" id="tt-${t.id}" onclick="event.stopPropagation();openEditTask('${t.id}')" title="Click to edit time">${fmt(taskTotal(t))}</div>`
+      }
+      <div class="task-controls" onclick="event.stopPropagation()">
+        ${subs.length>0
+          ? `<button class="ctrl-btn" title="Timer managed by subtasks" style="opacity:.3;cursor:default" disabled>${iPlay}</button>`
+          : t.state!=='running'
+            ? `<button class="ctrl-btn play" title="Start" onclick="startTask('${t.id}')">${iPlay}</button>`
+            : `<button class="ctrl-btn pause-btn" title="Pause" onclick="pauseTask('${t.id}')">${iPause}</button>`
+        }
+        ${t.state!=='stopped'?`<button class="ctrl-btn stop-btn" title="Stop" onclick="requestStopTask('${t.id}')">${iStop}</button>`:''}
+        <button class="ctrl-btn note-btn${hasNote?' has-note':''}" title="${hasNote?'View note':'Add note'}" onclick="event.stopPropagation();toggleNote('${t.id}')">${iNote}</button>
+        ${t.state==='stopped'?`<button class="ctrl-btn bill-btn${t.billed?' on':''}" title="${t.billed?'Mark as unbilled':'Mark as billed'}" onclick="toggleBilled('${t.id}')">${iBill}</button>`:''}
+        <button class="ctrl-btn" title="Edit" onclick="openEditTask('${t.id}')">${iEdit}</button>
+        <button class="ctrl-btn del-btn" title="Delete" onclick="delTask('${t.id}')">${iDel}</button>
+      </div>
+      <button class="expand-btn${exp?' open':''}" onclick="event.stopPropagation();toggleExp('${t.id}')">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><polyline points="4,3 8.5,6.5 4,10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    ${t._noteOpen?`<div class="note-panel">
+      <div class="note-panel-header">
+        <span class="note-panel-label">Note</span>
+        <div style="display:flex;gap:6px">
+          ${!t._noteEdit&&t.note?`<button class="note-save-btn" onclick="editNote('${t.id}')">Edit</button><button class="note-save-btn" style="color:var(--red)" onclick="deleteNote('${t.id}')">Delete</button>`:''}
+          ${t._noteEdit?`<button class="note-save-btn" onclick="saveNote('${t.id}')">Save</button>`:''}
+        </div>
+      </div>
+      ${t._noteEdit
+        ?`<textarea class="note-textarea" id="note-ta-${t.id}" placeholder="Paste emails, links, context…" spellcheck="false">${esc(t.note||'')}</textarea>`
+        :`<div class="note-read" onclick="editNote('${t.id}')">${esc(t.note||'').replace(/\n/g,'<br>')}</div>`
+      }
+    </div>`:''}
+    ${exp?`<div class="subtasks-wrap">
+      ${subs.map(s=>renderSubRow(t.id,s)).join('')}
+      <div class="add-sub-row"><input class="add-sub-input" id="si-${t.id}" placeholder="Add subtask…" onkeydown="if(event.key==='Enter')addSub('${t.id}')"/><button class="add-sub-go" onclick="addSub('${t.id}')">Add</button></div>
+    </div>`:''}
+  </div>`
+}
+
+// ── Render: subtask row ───────────────────────────────────────
+function renderSubRow(tid,s){
+  const cls=s.state==='running'?' running':s.state==='paused'?' paused':s.state==='stopped'?' stopped':''
+  const hasNote=!!(s.note&&s.note.trim())
+  return`<div id="sr-${s.id}">
+    <div class="subtask-item${cls}">
+      <div class="sub-dot"></div>
+      <div class="sub-name">${esc(s.name)}</div>
+      <div class="sub-timer" id="st-${s.id}" onclick="openEditSub('${tid}','${s.id}')" title="Click to edit time">${fmt(elap(s))}</div>
+      <div class="sub-controls">
+        ${s.state!=='running'?`<button class="sub-ctrl splay" title="Start" onclick="startSub('${tid}','${s.id}')"><svg width="7" height="9" viewBox="0 0 7 9" fill="currentColor"><path d="M0 0L7 4.5L0 9V0Z"/></svg></button>`:`<button class="sub-ctrl spause" title="Pause" onclick="pauseSub('${tid}','${s.id}')"><svg width="7" height="9" viewBox="0 0 7 9" fill="currentColor"><rect x="0" y="0" width="2.5" height="9" rx="1"/><rect x="4.5" y="0" width="2.5" height="9" rx="1"/></svg></button>`}
+        ${s.state!=='stopped'?`<button class="sub-ctrl sstop" title="Stop" onclick="stopSub('${tid}','${s.id}')"><svg width="7" height="7" viewBox="0 0 7 7" fill="currentColor"><rect width="7" height="7" rx="1.5"/></svg></button>`:''}
+        <button class="sub-ctrl snote${hasNote?' has-note':''}" title="${hasNote?'View note':'Add note'}" onclick="toggleSubNote('${tid}','${s.id}')">${iNote}</button>
+        <button class="sub-ctrl" title="Edit" onclick="openEditSub('${tid}','${s.id}')">${iEdit}</button>
+        <button class="sub-ctrl sdel" title="Delete" onclick="delSub('${tid}','${s.id}')">${iDel}</button>
+      </div>
+    </div>
+    ${s._noteOpen?`<div class="sub-note-panel">
+      <div class="sub-note-header">
+        <span class="sub-note-label">Note</span>
+        <div style="display:flex;gap:6px">
+          ${!s._noteEdit&&s.note?`<button class="note-save-btn" onclick="editSubNote('${tid}','${s.id}')">Edit</button><button class="note-save-btn" style="color:var(--red)" onclick="deleteSubNote('${tid}','${s.id}')">Delete</button>`:''}
+          ${s._noteEdit?`<button class="note-save-btn" onclick="saveSubNote('${tid}','${s.id}')">Save</button>`:''}
+        </div>
+      </div>
+      ${s._noteEdit
+        ?`<textarea class="sub-note-ta" id="snote-ta-${s.id}" placeholder="Paste emails, links, context…" spellcheck="false">${esc(s.note||'')}</textarea>`
+        :`<div class="note-read" style="font-size:12px;padding:2px 0" onclick="editSubNote('${tid}','${s.id}')">${esc(s.note||'').replace(/\n/g,'<br>')}</div>`
+      }
+    </div>`:''}
+  </div>`
+}
+
+function toggleExp(id){const t=S.tasks.find(t=>t.id===id);if(!t)return;t._exp=t._exp===false?true:false;reRT(t)}
+function reRT(t){const el=document.getElementById('tc-'+t.id);if(!el)return;const d=document.createElement('div');d.innerHTML=renderTaskCard(t);el.replaceWith(d.firstElementChild)}
+function reRS(task,sub){const el=document.getElementById('sr-'+sub.id);if(!el)return;const d=document.createElement('div');d.innerHTML=renderSubRow(task.id,sub);el.replaceWith(d.firstElementChild)}
+
+// ── Sidebar ──────────────────────────────────────────────────
+function renderSidebar(){
+  const td=todayStr()
+  const active=S.clients.filter(c=>!c.archived)
+  document.getElementById('client-list').innerHTML=active.map(c=>{
+    const n=S.tasks.filter(t=>t.clientId===c.id&&t.date===td).length
+    const act=S.selClient===c.id
+    return`<div class="client-item${act?' active':''}" onclick="selectClient('${c.id}')">
+      <div class="client-avatar" style="background:${c.color}22;color:${c.color}">${esc(initials(c.name))}</div>
+      <span class="client-name">${esc(c.name)}</span>
+      ${n?`<span class="client-badge">${n}</span>`:''}
+    </div>`
+  }).join('')
+  document.getElementById('total-today').textContent=fmt(todayTotal())
+  document.getElementById('total-sub').textContent=`${todayCount()} task${todayCount()===1?'':'s'} logged`
+  // Unbilled total across all stopped + unbilled tasks (any date)
+  const unbilled=S.tasks.filter(t=>t.state==='stopped'&&!t.billed).reduce((a,t)=>a+taskTotal(t),0)
+  const ubEl=document.getElementById('sidebar-unbilled')
+  if(ubEl){
+    if(unbilled>0){ubEl.style.display='block';document.getElementById('total-unbilled').textContent=fmt(unbilled)}
+    else ubEl.style.display='none'
+  }
+  const archivedCount=S.clients.filter(c=>c.archived).length
+  const abtn=document.getElementById('sidebar-archived-btn')
+  if(abtn){
+    if(archivedCount>0){abtn.style.display='flex';abtn.textContent=`View archived (${archivedCount})`}
+    else abtn.style.display='none'
+  }
+}
+function selectClient(id){S.selClient=id;searchQ='';filterStatus='all';if(curTab!=='today')switchTab('today');else{renderSidebar();renderMain()}}
+
+// ── Main: Today ───────────────────────────────────────────────
+function renderMain(){
+  const main=document.getElementById('main-area')
+  if(!S.selClient){
+    main.innerHTML=`<div class="center-state"><div class="center-icon">⏱</div><div class="center-title">Select or add a client</div><div class="center-sub">Tasks will appear here</div></div>`
+    return
+  }
+  const c=S.clients.find(c=>c.id===S.selClient)
+  main.innerHTML=`
+    <div class="main-header">
+      <div><div class="main-client-name">${esc(c.name)}</div><div class="main-client-sub">${new Date().toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'})}</div></div>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openEditClient('${c.id}')">Edit client</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddTask()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><line x1="6" y1="1" x2="6" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="1" y1="6" x2="11" y2="6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>New task</button>
+      </div>
+    </div>
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="currentColor" stroke-width="1.3"/><line x1="8.5" y1="8.5" x2="11.5" y2="11.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <input class="search-input" placeholder="Search tasks…" value="${esc(searchQ)}" oninput="onSearch(this.value)" id="search-inp"/>
+      </div>
+      <div class="filter-btns">
+        <button class="filter-btn${filterStatus==='all'?' active':''}" onclick="onFilter('all')">All</button>
+        <button class="filter-btn${filterStatus==='running'?' active':''}" onclick="onFilter('running')">Running</button>
+        <button class="filter-btn${filterStatus==='paused'?' active':''}" onclick="onFilter('paused')">Paused</button>
+        <button class="filter-btn${filterStatus==='stopped'?' active':''}" onclick="onFilter('stopped')">Done</button>
+      </div>
+    </div>
+    <div class="task-area" id="task-area"></div>`
+  renderTaskList()
+}
+function renderTaskList(){
+  const area=document.getElementById('task-area');if(!area)return
+  const td=todayStr()
+  let tasks=S.tasks.filter(t=>t.clientId===S.selClient&&t.date===td)
+  const q=searchQ.toLowerCase().trim()
+  if(q)tasks=tasks.filter(t=>t.name.toLowerCase().includes(q)||(t.subtasks||[]).some(s=>s.name.toLowerCase().includes(q)))
+  if(filterStatus!=='all')tasks=tasks.filter(t=>t.state===filterStatus)
+  const unbilled=tasks.filter(t=>!t.billed)
+  const billed=tasks.filter(t=>t.billed)
+  const billedTotal=billed.reduce((a,t)=>a+taskTotal(t),0)
+  let html=''
+  if(!tasks.length){
+    html=`<div class="center-state" style="height:100%"><div class="center-icon">${searchQ||filterStatus!=='all'?'🔍':'📋'}</div><div class="center-title">${searchQ||filterStatus!=='all'?'No tasks match':'No tasks yet'}</div><div class="center-sub">${searchQ||filterStatus!=='all'?'Try a different search or filter':'Hit "New task" to start tracking'}</div></div>`
+  } else {
+    html=unbilled.map(renderTaskCard).join('')
+    if(billed.length){
+      html+=`<div class="billed-section-header" onclick="toggleBilledSection()">
+        <svg class="billed-chevron${billedCollapsed?'':' open'}" width="13" height="13" viewBox="0 0 13 13" fill="none"><polyline points="4,3 8.5,6.5 4,10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="billed-section-label">Billed</span>
+        <span class="billed-section-count">${billed.length} task${billed.length===1?'':'s'}</span>
+        <span class="billed-section-total">${fmt(billedTotal)}</span>
+      </div>`
+      if(!billedCollapsed)html+=billed.map(renderTaskCard).join('')
+    }
+  }
+  area.innerHTML=html
+}
+
+function onSearch(v){
+  searchQ=v
+  if(searchDebounce)clearTimeout(searchDebounce)
+  searchDebounce=setTimeout(()=>renderTaskList(),120)
+}
+function onFilter(v){filterStatus=v;renderTaskList()}
+
+// ── Summary ───────────────────────────────────────────────────
+function setSumMode(mode){
+  sumMode=mode
+  const today=todayStr()
+  if(mode==='day'){sumStart=today;sumEnd=today}
+  else if(mode==='week'){sumStart=weekStart(today);sumEnd=dateAdd(sumStart,6)}
+  else if(mode==='month'){sumStart=monthStart(today);sumEnd=monthEnd(today)}
+  renderSummary()
+}
+function shiftSum(d){
+  if(sumMode==='day'){sumStart=dateAdd(sumStart,d);sumEnd=sumStart}
+  else if(sumMode==='week'){sumStart=dateAdd(sumStart,d*7);sumEnd=dateAdd(sumStart,6)}
+  else if(sumMode==='month'){
+    const [y,m]=sumStart.split('-').map(Number)
+    const nd=new Date(y,m-1+d,1)
+    sumStart=`${nd.getFullYear()}-${pad(nd.getMonth()+1)}-01`
+    sumEnd=monthEnd(sumStart)
+  }
+  renderSummary()
+}
+function onSumStart(v){if(!v)return;sumStart=v;if(sumStart>sumEnd)sumEnd=sumStart;renderSummary()}
+function onSumEnd(v){if(!v)return;sumEnd=v;if(sumEnd<sumStart)sumStart=sumEnd;renderSummary()}
+function renderSummary(){
+  const main=document.getElementById('main-area')
+  const tasks=S.tasks.filter(t=>t.date>=sumStart&&t.date<=sumEnd)
+  const totalSec=tasks.reduce((a,t)=>a+taskTotal(t),0)
+  const maxSec=Math.max(...tasks.map(t=>taskTotal(t)),1)
+  const byClient={}
+  tasks.forEach(t=>{if(!byClient[t.clientId])byClient[t.clientId]=0;byClient[t.clientId]+=taskTotal(t)})
+  const isSame=sumStart===sumEnd
+  const rangeLabel=isSame?dateLbl(sumStart):`${dateLbl(sumStart)} — ${dateLbl(sumEnd)}`
+  main.innerHTML=`<div class="summary-area">
+    <div class="summary-header" style="flex-wrap:wrap;gap:10px">
+      <div class="mode-tabs">
+        <button class="mode-tab${sumMode==='day'?' active':''}" onclick="setSumMode('day')">Day</button>
+        <button class="mode-tab${sumMode==='week'?' active':''}" onclick="setSumMode('week')">Week</button>
+        <button class="mode-tab${sumMode==='month'?' active':''}" onclick="setSumMode('month')">Month</button>
+        <button class="mode-tab${sumMode==='custom'?' active':''}" onclick="sumMode='custom';renderSummary()">Custom</button>
+      </div>
+      ${sumMode==='custom'
+        ?`<div class="date-range-row">
+            <input type="date" value="${sumStart}" onchange="onSumStart(this.value)"/>
+            <span style="color:var(--text3);font-size:12px">to</span>
+            <input type="date" value="${sumEnd}" onchange="onSumEnd(this.value)"/>
+          </div>`
+        :`<div class="date-nav">
+            <button class="date-nav-btn" onclick="shiftSum(-1)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><polyline points="8,3 4,6.5 8,10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <div class="date-nav-label" style="min-width:260px">${rangeLabel}</div>
+            <button class="date-nav-btn" ${sumEnd>=todayStr()?'disabled':''} onclick="shiftSum(1)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><polyline points="5,3 9,6.5 5,10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>`}
+      <div style="display:flex;gap:7px;margin-left:auto"><button class="btn btn-ghost btn-sm" onclick="exportCSV()">Export CSV</button></div>
+    </div>
+    <div class="sum-metrics" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+      <div class="metric-card"><div class="metric-label">Total time</div><div class="metric-val">${fmt(totalSec)}</div></div>
+      <div class="metric-card"><div class="metric-label">Unbilled</div><div class="metric-val" style="color:var(--amber)">${fmt(tasks.filter(t=>!t.billed).reduce((a,t)=>a+taskTotal(t),0))}</div></div>
+      <div class="metric-card"><div class="metric-label">Tasks</div><div class="metric-val">${tasks.length}</div></div>
+      <div class="metric-card"><div class="metric-label">Clients</div><div class="metric-val">${Object.keys(byClient).length}</div></div>
+    </div>
+    ${tasks.length===0?`<div class="center-state" style="padding:60px 0"><div class="center-icon">📭</div><div class="center-title">No tasks in this range</div></div>`:`
+    <div class="sum-section-title">Task breakdown</div>
+    ${tasks.map(t=>{
+      const c=S.clients.find(c=>c.id===t.clientId)
+      const pct=Math.round(taskTotal(t)/maxSec*100)
+      const subs=(t.subtasks||[]).filter(s=>elap(s)>0)
+      return`<div class="sum-task-card">
+        <div class="sum-task-row">
+          ${c?`<span class="sum-badge" style="background:${c.color}18;color:${c.color}">${esc(c.name)}</span>`:''}
+          <span class="sum-task-name">${esc(t.name)}</span>
+          ${!isSame?`<span style="font-size:11px;color:var(--text3)">${t.date}</span>`:''}
+          ${t.note?`<button onclick="toggleSumNote('${t.id}')" title="View note" style="width:22px;height:22px;border-radius:5px;border:1px solid rgba(124,110,245,.3);background:var(--accent-bg);color:var(--accent2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">${iNote}</button>`:'<div style="width:22px"></div>'}
+          <div class="sum-bar-wrap"><div class="sum-bar-fill" style="width:${pct}%;background:${c?.color||'var(--accent)'}"></div></div>
+          <span class="sum-task-time">${fmt(taskTotal(t))}</span>
+        </div>
+        ${t._sumNoteOpen&&t.note?`<div style="padding:10px 14px;border-top:1px solid var(--border);font-size:13px;color:var(--text2);white-space:pre-wrap;line-height:1.65">${esc(t.note)}</div>`:''}
+        ${subs.map(s=>`<div class="sum-sub-row">
+          <div style="width:5px;height:5px;border-radius:50%;background:${c?.color||'var(--accent)'};opacity:.5;flex-shrink:0"></div>
+          <span class="sum-sub-name">${esc(s.name)}</span>
+          ${s.note?`<button onclick="toggleSumSubNote('${t.id}','${s.id}')" title="View note" style="width:18px;height:18px;border-radius:4px;border:1px solid rgba(124,110,245,.3);background:var(--accent-bg);color:var(--accent2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0">${iNote}</button>`:''}
+          <span class="sum-sub-time">${fmt(elap(s))}</span>
+        </div>${s._sumNoteOpen&&s.note?`<div style="padding:6px 14px 6px 28px;border-top:1px solid var(--border);font-size:12px;color:var(--text2);white-space:pre-wrap;line-height:1.6">${esc(s.note)}</div>`:''}`).join('')}
+      </div>`
+    }).join('')}
+    ${Object.keys(byClient).length>=1?`<div style="margin-top:18px"><div class="sum-section-title">By client</div>${Object.entries(byClient).sort((a,b)=>b[1]-a[1]).map(([cid,sec])=>{const c=S.clients.find(c=>c.id===cid);const pct=Math.round(sec/totalSec*100);return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:10px;height:10px;border-radius:3px;background:${c?.color||'#888'};flex-shrink:0"></div><span style="font-size:13px;color:var(--text);flex:1">${esc(c?.name||'Unknown')}</span><span style="font-size:12px;color:var(--text3)">${pct}%</span><span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--text2)">${fmt(sec)}</span></div>`}).join('')}</div>`:''}`}
+  </div>`
+}
+function toggleSumNote(id){const t=S.tasks.find(t=>t.id===id);if(!t)return;t._sumNoteOpen=!t._sumNoteOpen;renderSummary()}
+function toggleSumSubNote(tid,sid){const t=S.tasks.find(t=>t.id===tid);const s=(t?.subtasks||[]).find(s=>s.id===sid);if(!s)return;s._sumNoteOpen=!s._sumNoteOpen;renderSummary()}
+
+// ── History ───────────────────────────────────────────────────
+function getHistDateRange(){
+  const td=todayStr()
+  if(histDate==='all')return null
+  if(histDate==='7')return {start:dateAdd(td,-6),end:td}
+  if(histDate==='30')return {start:dateAdd(td,-29),end:td}
+  if(histDate==='this-month')return {start:monthStart(td),end:td}
+  if(histDate==='last-month'){
+    const [y,m]=monthStart(td).split('-').map(Number)
+    const nd=new Date(y,m-2,1)
+    const ms=`${nd.getFullYear()}-${pad(nd.getMonth()+1)}-01`
+    return {start:ms,end:monthEnd(ms)}
+  }
+  if(histDate==='custom'&&histStart&&histEnd)return {start:histStart,end:histEnd}
+  return null
+}
+function renderHistory(){
+  const main=document.getElementById('main-area')
+  const q=histSearch.toLowerCase().trim()
+  let all=S.tasks.slice()
+  if(q)all=all.filter(t=>t.name.toLowerCase().includes(q)||(t.subtasks||[]).some(s=>s.name.toLowerCase().includes(q))||(S.clients.find(c=>c.id===t.clientId)?.name||'').toLowerCase().includes(q))
+  if(histFilter!=='all')all=all.filter(t=>t.state===histFilter)
+  if(histClient!=='all')all=all.filter(t=>t.clientId===histClient)
+  const range=getHistDateRange()
+  if(range)all=all.filter(t=>t.date>=range.start&&t.date<=range.end)
+  const byDate={}
+  all.forEach(t=>{if(!byDate[t.date])byDate[t.date]=[];byDate[t.date].push(t)})
+  const dates=Object.keys(byDate).sort((a,b)=>b.localeCompare(a))
+  const clientOpts=['<option value="all">All clients</option>'].concat(S.clients.map(c=>`<option value="${esc(c.id)}"${c.id===histClient?' selected':''}>${esc(c.name)}${c.archived?' (archived)':''}</option>`)).join('')
+  main.innerHTML=`
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="currentColor" stroke-width="1.3"/><line x1="8.5" y1="8.5" x2="11.5" y2="11.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <input class="search-input" placeholder="Search all history — tasks, subtasks, clients…" value="${esc(histSearch)}" oninput="onHistSearch(this.value)" id="hist-search-inp"/>
+      </div>
+      <select class="filter-select" id="hist-client-select" onchange="onHistClient(this.value)">${clientOpts}</select>
+      <select class="filter-select" id="hist-date-select" onchange="onHistDate(this.value)">
+        <option value="all"${histDate==='all'?' selected':''}>All time</option>
+        <option value="7"${histDate==='7'?' selected':''}>Last 7 days</option>
+        <option value="30"${histDate==='30'?' selected':''}>Last 30 days</option>
+        <option value="this-month"${histDate==='this-month'?' selected':''}>This month</option>
+        <option value="last-month"${histDate==='last-month'?' selected':''}>Last month</option>
+        <option value="custom"${histDate==='custom'?' selected':''}>Custom</option>
+      </select>
+      <div class="filter-btns">
+        <button class="filter-btn${histFilter==='all'?' active':''}" onclick="onHistFilter('all')">All</button>
+        <button class="filter-btn${histFilter==='running'?' active':''}" onclick="onHistFilter('running')">Running</button>
+        <button class="filter-btn${histFilter==='paused'?' active':''}" onclick="onHistFilter('paused')">Paused</button>
+        <button class="filter-btn${histFilter==='stopped'?' active':''}" onclick="onHistFilter('stopped')">Done</button>
+      </div>
+    </div>
+    ${histDate==='custom'?`<div class="hist-date-range">
+      <input type="date" value="${histStart}" onchange="histStart=this.value;renderHistory()"/>
+      <span style="color:var(--text3);font-size:12px">to</span>
+      <input type="date" value="${histEnd}" onchange="histEnd=this.value;renderHistory()"/>
+    </div>`:''}
+    ${dates.length===0
+      ?`<div class="center-state" style="flex:1"><div class="center-icon">${q||histFilter!=='all'?'🔍':'📚'}</div><div class="center-title">${q||histFilter!=='all'?'No matches':'No history yet'}</div><div class="center-sub">${q||histFilter!=='all'?'Try a different search or filter':'Completed tasks will appear here'}</div></div>`
+      :`<div class="history-area">${dates.map(date=>{
+        const tasks=byDate[date]
+        const total=tasks.reduce((a,t)=>a+taskTotal(t),0)
+        const label=dateLbl(date)
+        return`<div class="history-day">
+          <div class="history-day-header">
+            <div class="history-day-label">${label}</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="history-day-total">${fmt(total)}</span>
+              <button class="btn btn-ghost btn-sm" onclick="jumpSummary('${date}')" style="font-size:11px;padding:4px 10px">View summary</button>
+            </div>
+          </div>
+          ${tasks.map(t=>{const c=S.clients.find(c=>c.id===t.clientId);const p=compPct(t);return`<div class="history-task-row">
+            <div class="h-dot" style="background:${c?.color||'#888'}"></div>
+            <div style="flex:1;min-width:0"><div class="h-task-name">${esc(t.name)}</div><div class="h-client-name">${esc(c?.name||'')}</div></div>
+            ${t.subtasks?.length?`<div style="display:flex;align-items:center;gap:5px"><div style="width:48px;height:3px;background:var(--bg4);border-radius:3px;overflow:hidden"><div style="width:${p}%;height:3px;background:var(--green);border-radius:3px"></div></div><span style="font-size:11px;color:var(--text3)">${p}%</span></div>`:''}
+            <div class="h-task-time">${fmt(taskTotal(t))}</div>
+            <div style="display:flex;gap:4px">
+              <button class="ctrl-btn" title="Edit" onclick="openEditTask('${t.id}')">${iEdit}</button>
+              <button class="ctrl-btn del-btn" title="Delete" onclick="delTask('${t.id}')">${iDel}</button>
+            </div>
+          </div>`}).join('')}
+        </div>`
+      }).join('')}</div>`}
+  `
+}
+function onHistSearch(v){
+  histSearch=v
+  if(searchDebounce)clearTimeout(searchDebounce)
+  searchDebounce=setTimeout(()=>{
+    renderHistory()
+    const inp=document.getElementById('hist-search-inp');if(inp){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length)}
+  },120)
+}
+function onHistFilter(v){histFilter=v;renderHistory()}
+function onHistClient(v){histClient=v;renderHistory()}
+function onHistDate(v){
+  histDate=v
+  if(v==='custom'&&!histStart){
+    const td=todayStr()
+    histStart=dateAdd(td,-29)
+    histEnd=td
+  }
+  renderHistory()
+}
+function jumpSummary(date){sumStart=date;sumEnd=date;sumMode='day';switchTab('summary')}
+
+// ── Export ────────────────────────────────────────────────────
+function exportCSV(){
+  const tasks=S.tasks.filter(t=>t.date>=sumStart&&t.date<=sumEnd)
+  if(!tasks.length)return
+  const rows=[['Date','Client','Task','Subtask','Duration (min)','Notes']]
+  tasks.forEach(t=>{
+    const c=S.clients.find(c=>c.id===t.clientId)
+    const subs=t.subtasks||[]
+    if(subs.length){
+      subs.forEach(s=>rows.push([t.date,c?.name||'',t.name,s.name,(elap(s)/60).toFixed(1),(s.note||'').replace(/\n/g,' ')]))
+    } else {
+      rows.push([t.date,c?.name||'',t.name,'',(taskTotal(t)/60).toFixed(1),(t.note||'').replace(/\n/g,' ')])
+    }
+  })
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n')
+  const name=sumStart===sumEnd?`worklog-${sumStart}.csv`:`worklog-${sumStart}_to_${sumEnd}.csv`
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=name;a.click()
+}
+
+// ── Tab switching ─────────────────────────────────────────────
+function switchTab(tab){
+  curTab=tab
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'))
+  document.getElementById('tab-'+tab).classList.add('active')
+  if(tab==='today'){renderSidebar();renderMain()}
+  else if(tab==='summary'){renderSummary()}
+  else if(tab==='history')renderHistory()
+}
+
+// ── Keyboard shortcuts ────────────────────────────────────────
+function onKeydown(e){
+  const inInput=e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT'||e.target.isContentEditable)
+  if(e.key==='Escape'){
+    document.querySelectorAll('.modal-backdrop.open').forEach(el=>el.classList.remove('open'))
+    return
+  }
+  if(inInput)return
+  if(e.key===' '||e.code==='Space'){
+    const rt=runningTask()
+    if(rt){e.preventDefault();floatPause();return}
+    if(curTab==='today'&&S.selClient){
+      const td=todayStr()
+      const p=S.tasks.find(t=>t.clientId===S.selClient&&t.date===td&&t.state==='paused')
+      if(p){
+        e.preventDefault()
+        if((p.subtasks||[]).length){const sp=p.subtasks.find(s=>s.state==='paused');if(sp)startSub(p.id,sp.id)}
+        else startTask(p.id)
+      }
+    }
+  } else if(e.key==='n'||e.key==='N'){
+    if(curTab==='today'&&S.selClient){e.preventDefault();openAddTask()}
+  } else if(e.key==='/'){
+    if(curTab==='today'){const inp=document.getElementById('search-inp');if(inp){e.preventDefault();inp.focus()}}
+    else if(curTab==='history'){const inp=document.getElementById('hist-search-inp');if(inp){e.preventDefault();inp.focus()}}
+  }
+}
+
+// ── System idle + tray handlers ───────────────────────────────
+function handleSystemIdle(reason){
+  const rt=runningTask();if(!rt)return
+  pauseAll();save()
+  if(curTab==='today')renderMain()
+  else if(curTab==='summary')renderSummary()
+  else if(curTab==='history')renderHistory()
+  renderSidebar()
+  showToast(`Timer paused — system ${reason==='lock'?'locked':'went to sleep'}`)
+}
+function handleTrayAction(action){
+  if(action==='pause')floatPause()
+  else if(action==='stop')floatStop()
+}
+
+// ── Init ──────────────────────────────────────────────────────
+async function init(){
+  document.getElementById('titlebar-date').textContent=new Date().toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'})
+  await load()
+  applyTheme(S.theme||'dark')
+  if(!S.selClient&&S.clients.length)S.selClient=S.clients[0].id
+  renderSidebar();renderMain();startTick()
+  document.addEventListener('keydown',onKeydown)
+  window.addEventListener('blur',()=>save())
+  if(window.electronAPI){
+    if(window.electronAPI.onSystemIdle)window.electronAPI.onSystemIdle(handleSystemIdle)
+    if(window.electronAPI.onTrayAction)window.electronAPI.onTrayAction(handleTrayAction)
+  }
+}
+init()
+</script>
+</body>
+</html>
