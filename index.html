@@ -339,7 +339,8 @@ svg{display:block;}
 .billed-section-total{font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);margin-left:10px;}
 .billed-chevron{transition:transform .2s;color:var(--green);}
 .billed-chevron.open{transform:rotate(90deg);}
-.sidebar-unbilled{font-size:11px;color:var(--text3);margin-top:6px;}
+.sidebar-unbilled{font-size:11px;color:var(--text3);margin-top:6px;cursor:pointer;width:max-content;padding:3px 0;border-radius:5px;}
+.sidebar-unbilled:hover b{color:var(--text);}
 .sidebar-unbilled b{color:var(--amber);font-family:'DM Mono',monospace;font-weight:500;}
 
 /* ── History filter selects ── */
@@ -381,7 +382,7 @@ svg{display:block;}
       <div class="sidebar-total-label">Total today</div>
       <div class="sidebar-total-time" id="total-today">00:00:00</div>
       <div class="sidebar-total-sub" id="total-sub">0 tasks logged</div>
-      <div class="sidebar-unbilled" id="sidebar-unbilled" style="display:none">Unbilled: <b id="total-unbilled">00:00:00</b></div>
+      <div class="sidebar-unbilled" id="sidebar-unbilled" onclick="openUnbilledHistory()" title="Show unbilled tasks" style="display:none">Unbilled: <b id="total-unbilled">00:00:00</b></div>
       <button class="sidebar-archived-btn" id="sidebar-archived-btn" onclick="openArchivedModal()" style="display:none">View archived</button>
     </div>
   </div>
@@ -702,6 +703,13 @@ function toggleBilled(id){
   showToast(t.billed?`Marked "${t.name}" as billed`:`Marked "${t.name}" as unbilled`)
 }
 function toggleBilledSection(){billedCollapsed=!billedCollapsed;renderTaskList()}
+function openUnbilledHistory(){
+  histSearch=''
+  histFilter='unbilled'
+  histClient='all'
+  histDate='all'
+  switchTab('history')
+}
 
 // ── Notes ────────────────────────────────────────────────────
 function toggleNote(id){
@@ -1217,7 +1225,8 @@ function renderHistory(){
   const q=histSearch.toLowerCase().trim()
   let all=S.tasks.slice()
   if(q)all=all.filter(t=>t.name.toLowerCase().includes(q)||(t.subtasks||[]).some(s=>s.name.toLowerCase().includes(q))||(S.clients.find(c=>c.id===t.clientId)?.name||'').toLowerCase().includes(q))
-  if(histFilter!=='all')all=all.filter(t=>t.state===histFilter)
+  if(histFilter==='unbilled')all=all.filter(t=>t.state==='stopped'&&!t.billed)
+  else if(histFilter!=='all')all=all.filter(t=>t.state===histFilter)
   if(histClient!=='all')all=all.filter(t=>t.clientId===histClient)
   const range=getHistDateRange()
   if(range)all=all.filter(t=>t.date>=range.start&&t.date<=range.end)
@@ -1245,6 +1254,7 @@ function renderHistory(){
         <button class="filter-btn${histFilter==='running'?' active':''}" onclick="onHistFilter('running')">Running</button>
         <button class="filter-btn${histFilter==='paused'?' active':''}" onclick="onHistFilter('paused')">Paused</button>
         <button class="filter-btn${histFilter==='stopped'?' active':''}" onclick="onHistFilter('stopped')">Done</button>
+        <button class="filter-btn${histFilter==='unbilled'?' active':''}" onclick="onHistFilter('unbilled')">Unbilled</button>
       </div>
     </div>
     ${histDate==='custom'?`<div class="hist-date-range">
@@ -1272,6 +1282,7 @@ function renderHistory(){
             ${t.subtasks?.length?`<div style="display:flex;align-items:center;gap:5px"><div style="width:48px;height:3px;background:var(--bg4);border-radius:3px;overflow:hidden"><div style="width:${p}%;height:3px;background:var(--green);border-radius:3px"></div></div><span style="font-size:11px;color:var(--text3)">${p}%</span></div>`:''}
             <div class="h-task-time">${fmt(taskTotal(t))}</div>
             <div style="display:flex;gap:4px">
+              ${t.state==='stopped'?`<button class="ctrl-btn bill-btn${t.billed?' on':''}" title="${t.billed?'Mark as unbilled':'Mark as billed'}" onclick="toggleBilled('${t.id}')">${iBill}</button>`:''}
               <button class="ctrl-btn" title="Edit" onclick="openEditTask('${t.id}')">${iEdit}</button>
               <button class="ctrl-btn del-btn" title="Delete" onclick="delTask('${t.id}')">${iDel}</button>
             </div>
