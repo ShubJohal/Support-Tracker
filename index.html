@@ -349,6 +349,81 @@ svg{display:block;}
 .filter-select:focus{border-color:var(--accent);}
 .hist-date-range{display:flex;align-items:center;gap:6px;padding:8px 22px 4px;}
 .hist-date-range input[type="date"]{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;}
+
+/* Todo */
+.todo-area{flex:1;overflow-y:auto;padding:16px 22px 24px;}
+.todo-area::-webkit-scrollbar{width:3px;}
+.todo-area::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+.todo-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.todo-title{font-size:18px;font-weight:600;color:var(--text);}
+.todo-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+.todo-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px;}
+.todo-metric{border:1px solid var(--border);background:var(--bg2);border-radius:var(--radius-sm);padding:10px 12px;min-width:0;}
+.todo-metric-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.todo-metric-val{font-family:'DM Mono',monospace;font-size:18px;color:var(--text);font-weight:500;}
+.todo-command{display:grid;grid-template-columns:minmax(180px,1fr) 180px auto;gap:8px;align-items:center;margin-bottom:10px;}
+.todo-input-wrap{position:relative;min-width:0;}
+.todo-input-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;}
+.todo-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px 8px 31px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;transition:border-color .15s;-webkit-user-select:text;user-select:text;}
+.todo-input:focus{border-color:var(--accent);}
+.todo-client-select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text2);outline:none;min-width:0;}
+.todo-client-select:focus{border-color:var(--accent);}
+.todo-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;}
+.todo-filter-row{display:flex;gap:4px;flex-wrap:wrap;}
+.todo-section{margin-bottom:20px;}
+.todo-section-head{display:flex;align-items:center;gap:8px;margin:0 0 8px;}
+.todo-section-title{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;}
+.todo-section-count{font-size:11px;color:var(--text3);}
+.todo-list{display:flex;flex-direction:column;gap:6px;}
+.todo-row{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;transition:background .15s,border-color .15s,opacity .15s;}
+.todo-row:hover{background:var(--bg3);border-color:var(--border2);}
+.todo-row.overdue{border-color:rgba(245,101,101,.34);}
+.todo-row.due-today{border-color:rgba(245,166,35,.34);}
+.todo-row.completed{opacity:.62;}
+.todo-check{width:22px;height:22px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;}
+.todo-check:hover{border-color:var(--green);background:var(--green-bg);}
+.todo-check.done{background:var(--green-bg);border-color:rgba(34,201,119,.4);color:var(--green);}
+.todo-main{min-width:0;cursor:pointer;}
+.todo-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.todo-row.completed .todo-name{text-decoration:line-through;color:var(--text3);}
+.todo-note-preview{font-size:12px;color:var(--text3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.todo-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:5px;}
+.todo-pill{font-size:11px;color:var(--text3);background:var(--bg4);border:1px solid var(--border);border-radius:999px;padding:2px 7px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.todo-pill.client{color:var(--text2);}
+.todo-pill.reminder{color:var(--accent2);background:var(--accent-bg);border-color:rgba(124,110,245,.25);}
+.todo-pill.overdue{color:var(--red);background:var(--red-bg);border-color:rgba(245,101,101,.28);}
+.todo-pill.today{color:var(--amber);background:var(--amber-bg);border-color:rgba(245,166,35,.25);}
+.todo-pill.priority-high{color:var(--red);background:var(--red-bg);border-color:rgba(245,101,101,.28);}
+.todo-pill.priority-medium{color:var(--amber);background:var(--amber-bg);border-color:rgba(245,166,35,.25);}
+.todo-pill.priority-low{color:var(--text3);background:transparent;border-color:var(--border2);}
+.todo-actions{display:flex;gap:5px;}
+.todo-empty{height:260px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text3);gap:8px;text-align:center;}
+.todo-empty-icon{font-size:40px;opacity:.24;}
+.todo-empty-title{font-size:14px;font-weight:500;color:var(--text2);}
+.todo-empty-sub{font-size:12px;color:var(--text3);}
+.todo-reminder-row{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;}
+.todo-reminder-row input{accent-color:var(--accent);}
+.todo-reminder-row span{font-size:13px;color:var(--text2);}
+.todo-textarea{width:100%;min-height:72px;resize:vertical;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 11px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;line-height:1.5;-webkit-user-select:text;user-select:text;}
+.todo-textarea:focus{border-color:var(--accent);}
+.priority-seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px;}
+.priority-option{position:relative;}
+.priority-option input{position:absolute;opacity:0;pointer-events:none;}
+.priority-option span{display:flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;padding:7px 8px;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;transition:all .15s;}
+.priority-option span::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--text3);}
+.priority-option.high span::before{background:var(--red);}
+.priority-option.medium span::before{background:var(--amber);}
+.priority-option.low span::before{background:var(--text3);}
+.priority-option input:checked+span{background:var(--bg);color:var(--text);box-shadow:0 1px 3px var(--shadow);}
+.todo-modal{width:430px;}
+
+@media (max-width:900px){
+  .todo-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .todo-command{grid-template-columns:1fr;}
+  .todo-toolbar{align-items:flex-start;flex-direction:column;}
+  .todo-row{grid-template-columns:28px minmax(0,1fr);}
+  .todo-actions{grid-column:2;justify-self:start;}
+}
 </style>
 </head>
 <body>
@@ -360,6 +435,7 @@ svg{display:block;}
   <span class="titlebar-date" id="titlebar-date"></span>
   <div class="titlebar-nav">
     <button class="tab-btn active" id="tab-today" onclick="switchTab('today')">Today</button>
+    <button class="tab-btn" id="tab-todos" onclick="switchTab('todos')">To-do</button>
     <button class="tab-btn" id="tab-summary" onclick="switchTab('summary')">Summary</button>
     <button class="tab-btn" id="tab-history" onclick="switchTab('history')">History</button>
     <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">
@@ -382,6 +458,7 @@ svg{display:block;}
       <div class="sidebar-total-label">Total today</div>
       <div class="sidebar-total-time" id="total-today">00:00:00</div>
       <div class="sidebar-total-sub" id="total-sub">0 tasks logged</div>
+      <div class="sidebar-unbilled" id="sidebar-todos" onclick="switchTab('todos')" title="Show open to-dos" style="display:none">To-dos: <b id="total-todos">0</b></div>
       <div class="sidebar-unbilled" id="sidebar-unbilled" onclick="openUnbilledHistory()" title="Show unbilled tasks" style="display:none">Unbilled: <b id="total-unbilled">00:00:00</b></div>
       <button class="sidebar-archived-btn" id="sidebar-archived-btn" onclick="openArchivedModal()" style="display:none">View archived</button>
     </div>
@@ -436,6 +513,33 @@ svg{display:block;}
   </div>
 </div>
 
+<!-- Modal: Todo -->
+<div class="modal-backdrop" id="modal-todo">
+  <div class="modal todo-modal">
+    <div class="modal-title" id="mtodo-title">New to-do</div>
+    <div class="modal-field"><div class="modal-label">To-do</div><input class="modal-input" id="inp-todo-title" placeholder="e.g. Follow up with client" onkeydown="if(event.key==='Enter')saveTodo()"/></div>
+    <div class="modal-row">
+      <div><div class="modal-label">Client</div><select class="modal-select" id="inp-todo-client"></select></div>
+      <div><div class="modal-label">Due</div><input class="modal-input" id="inp-todo-due" type="datetime-local" onchange="syncTodoReminderDefault()"/></div>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Priority</div>
+      <div class="priority-seg">
+        <label class="priority-option high"><input type="radio" name="todo-priority" value="high"/><span>High</span></label>
+        <label class="priority-option medium"><input type="radio" name="todo-priority" value="medium"/><span>Medium</span></label>
+        <label class="priority-option low"><input type="radio" name="todo-priority" value="low"/><span>Low</span></label>
+      </div>
+    </div>
+    <div class="modal-field">
+      <label class="todo-reminder-row"><input type="checkbox" id="inp-todo-reminder-enabled" onchange="toggleTodoReminderField()"/><span>Remind me</span></label>
+      <div style="margin-top:8px" id="todo-reminder-field"><input class="modal-input" id="inp-todo-reminder" type="datetime-local"/></div>
+      <div class="modal-note">Leave reminder off for a simple checklist item.</div>
+    </div>
+    <div class="modal-field"><div class="modal-label">Note</div><textarea class="todo-textarea" id="inp-todo-note" placeholder="Optional context, links or handover notes"></textarea></div>
+    <div class="modal-actions"><button class="modal-del" id="mtodo-del" onclick="deleteTodoFromModal()" style="display:none">Delete to-do</button><button class="btn btn-ghost btn-sm" onclick="closeModal('modal-todo')">Cancel</button><button class="btn btn-primary btn-sm" onclick="saveTodo()">Save</button></div>
+  </div>
+</div>
+
 <!-- Modal: Archived clients -->
 <div class="modal-backdrop" id="modal-archived">
   <div class="modal">
@@ -477,20 +581,22 @@ const COLORS=['#7c6ef5','#3dd68c','#f5a623','#f56565','#63b3ed','#fc8181','#68d3
 const pad=n=>String(Math.max(0,n|0)).padStart(2,'0')
 const uid=()=>Math.random().toString(36).slice(2,10)
 function fmt(s){s=Math.max(0,s|0);return`${pad(s/3600|0)}:${pad((s%3600)/60|0)}:${pad(s%60)}`}
-function todayStr(){return new Date().toISOString().slice(0,10)}
+function dateKey(x=new Date()){return `${x.getFullYear()}-${pad(x.getMonth()+1)}-${pad(x.getDate())}`}
+function todayStr(){return dateKey()}
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function dateAdd(d,n){const x=new Date(d+'T12:00:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)}
+function dateAdd(d,n){const x=new Date(d+'T12:00:00');x.setDate(x.getDate()+n);return dateKey(x)}
 function dateLbl(d){return new Date(d+'T12:00:00').toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
-function weekStart(d){const x=new Date(d+'T12:00:00');const dow=(x.getDay()+6)%7;x.setDate(x.getDate()-dow);return x.toISOString().slice(0,10)}
+function weekStart(d){const x=new Date(d+'T12:00:00');const dow=(x.getDay()+6)%7;x.setDate(x.getDate()-dow);return dateKey(x)}
 function monthStart(d){return d.slice(0,7)+'-01'}
 function monthEnd(d){const [y,m]=d.split('-').map(Number);const last=new Date(y,m,0).getDate();return `${d.slice(0,7)}-${pad(last)}`}
 
-let S={clients:[],tasks:[],selClient:null,selColor:COLORS[0]}
+let S={clients:[],tasks:[],todos:[],selClient:null,selColor:COLORS[0]}
 let curTab='today',sumStart=todayStr(),sumEnd=todayStr(),sumMode='day'
 let editClient=null,editTask=null,editSub=null,confirmCb=null,tickInt=null,autoSaveCounter=0
 let searchQ='',filterStatus='all',searchDebounce=null
 let histSearch='',histFilter='all',histClient='all',histDate='all',histStart='',histEnd=''
 let billedCollapsed=true
+let editTodo=null,todoFilter='open',todoPriorityFilter='all',todoClientFilter='all',todoSearch='',todoReminderCheckAt=0
 
 // ── Persistence ──────────────────────────────────────────────
 async function load(){
@@ -501,6 +607,7 @@ async function load(){
     if(d){
       S.clients=d.clients||[]
       S.tasks=d.tasks||[]
+      S.todos=d.todos||[]
       S.theme=d.theme||'dark'
       // If the gap between last save and now is > 10s, the app was closed — auto-pause any running timer
       const gap=d.savedAt?(Date.now()-d.savedAt)/1000:Infinity
@@ -530,7 +637,7 @@ function bankRunningInPlace(){
 }
 function save(){
   bankRunningInPlace()
-  const d={clients:S.clients,tasks:S.tasks,theme:document.documentElement.getAttribute('data-theme'),savedAt:Date.now()}
+  const d={clients:S.clients,tasks:S.tasks,todos:S.todos||[],theme:document.documentElement.getAttribute('data-theme'),savedAt:Date.now()}
   if(window.electronAPI)window.electronAPI.saveData(d)
   else{try{localStorage.setItem('wl4',JSON.stringify(d))}catch(e){}}
 }
@@ -602,6 +709,7 @@ function startTick(){
     // Auto-save every 30s while something is running, to minimise data loss
     autoSaveCounter++
     if(rt&&autoSaveCounter>=30){autoSaveCounter=0;save()}
+    checkTodoReminders()
   },1000)
 }
 
@@ -712,6 +820,267 @@ function openUnbilledHistory(){
 }
 
 // ── Notes ────────────────────────────────────────────────────
+// Todo
+function todoClientOptions(selId,includeAll=false){
+  const opts=[]
+  if(includeAll)opts.push(`<option value="all"${selId==='all'?' selected':''}>All clients</option>`)
+  else opts.push(`<option value=""${!selId?' selected':''}>No client</option>`)
+  S.clients.forEach(c=>opts.push(`<option value="${esc(c.id)}"${c.id===selId?' selected':''}>${esc(c.name)}${c.archived?' (archived)':''}</option>`))
+  return opts.join('')
+}
+function todoClient(t){return t.clientId?S.clients.find(c=>c.id===t.clientId):null}
+function todoPriority(t){return ['high','medium','low'].includes(t.priority)?t.priority:'medium'}
+function todoPriorityLabel(t){const p=todoPriority(t);return p.charAt(0).toUpperCase()+p.slice(1)}
+function todoPriorityOptions(sel='all'){
+  return ['all','high','medium','low'].map(p=>`<option value="${p}"${p===sel?' selected':''}>${p==='all'?'All priorities':p.charAt(0).toUpperCase()+p.slice(1)}</option>`).join('')
+}
+function setTodoPriority(p){document.querySelectorAll('input[name="todo-priority"]').forEach(el=>{el.checked=el.value===p})}
+function getTodoPriority(){return document.querySelector('input[name="todo-priority"]:checked')?.value||'medium'}
+function inputFromTs(ts){if(!ts)return'';const d=new Date(ts);return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`}
+function tsFromInput(v){if(!v)return null;const ts=new Date(v).getTime();return Number.isFinite(ts)?ts:null}
+function fmtTodoDate(ts){
+  if(!ts)return''
+  return new Date(ts).toLocaleString('en-AU',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})
+}
+function defaultReminderFor(dueAt){return dueAt?Math.max(Date.now(),dueAt-60*60*1000):Date.now()+60*60*1000}
+function todoState(t){
+  if(t.completedAt)return'completed'
+  if(!t.dueAt)return'no-date'
+  const key=dateKey(new Date(t.dueAt)),td=todayStr()
+  if(t.dueAt<Date.now())return'overdue'
+  if(key===td)return'due-today'
+  return'upcoming'
+}
+function todoDueLabel(t){
+  const st=todoState(t)
+  if(st==='completed')return t.completedAt?'Completed '+fmtTodoDate(t.completedAt):'Completed'
+  if(!t.dueAt)return'No due date'
+  if(st==='overdue')return'Due '+fmtTodoDate(t.dueAt)
+  if(st==='due-today')return'Today '+new Date(t.dueAt).toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})
+  return fmtTodoDate(t.dueAt)
+}
+function todoSort(a,b){
+  const rank={high:0,medium:1,low:2}
+  const pr=(rank[todoPriority(a)]??1)-(rank[todoPriority(b)]??1)
+  if(pr)return pr
+  const av=a.completedAt?Number.MAX_SAFE_INTEGER:(a.dueAt||Number.MAX_SAFE_INTEGER-1)
+  const bv=b.completedAt?Number.MAX_SAFE_INTEGER:(b.dueAt||Number.MAX_SAFE_INTEGER-1)
+  return av-bv || (b.createdAt||0)-(a.createdAt||0)
+}
+function visibleTodos(){
+  let list=(S.todos||[]).slice()
+  const q=todoSearch.toLowerCase().trim()
+  if(q)list=list.filter(t=>(t.title||'').toLowerCase().includes(q)||(t.note||'').toLowerCase().includes(q))
+  if(todoClientFilter!=='all')list=list.filter(t=>(t.clientId||'')===todoClientFilter)
+  if(todoPriorityFilter!=='all')list=list.filter(t=>todoPriority(t)===todoPriorityFilter)
+  if(todoFilter==='open')list=list.filter(t=>!t.completedAt)
+  else if(todoFilter==='due-soon')list=list.filter(t=>!t.completedAt&&t.dueAt&&t.dueAt<=Date.now()+48*60*60*1000)
+  else if(todoFilter==='no-date')list=list.filter(t=>!t.completedAt&&!t.dueAt)
+  else if(todoFilter==='completed')list=list.filter(t=>t.completedAt)
+  return list.sort(todoSort)
+}
+function groupTodos(list){
+  const groups={overdue:[],today:[],upcoming:[],none:[],completed:[]}
+  list.forEach(t=>{
+    const st=todoState(t)
+    if(st==='completed')groups.completed.push(t)
+    else if(st==='overdue')groups.overdue.push(t)
+    else if(st==='due-today')groups.today.push(t)
+    else if(st==='upcoming')groups.upcoming.push(t)
+    else groups.none.push(t)
+  })
+  return groups
+}
+function renderTodoTab(){
+  const main=document.getElementById('main-area')
+  const all=S.todos||[]
+  const open=all.filter(t=>!t.completedAt)
+  const dueSoon=open.filter(t=>t.dueAt&&t.dueAt<=Date.now()+48*60*60*1000)
+  const overdue=open.filter(t=>t.dueAt&&t.dueAt<Date.now())
+  const high=open.filter(t=>todoPriority(t)==='high')
+  main.innerHTML=`<div class="todo-area">
+    <div class="todo-header">
+      <div><div class="todo-title">To-do</div><div class="todo-sub">${open.length} open item${open.length===1?'':'s'} across clients</div></div>
+      <button class="btn btn-primary btn-sm" onclick="openAddTodo()">New to-do</button>
+    </div>
+    <div class="todo-metrics">
+      <div class="todo-metric"><div class="todo-metric-label">Open</div><div class="todo-metric-val">${open.length}</div></div>
+      <div class="todo-metric"><div class="todo-metric-label">Due soon</div><div class="todo-metric-val" style="color:var(--amber)">${dueSoon.length}</div></div>
+      <div class="todo-metric"><div class="todo-metric-label">Overdue</div><div class="todo-metric-val" style="color:var(--red)">${overdue.length}</div></div>
+      <div class="todo-metric"><div class="todo-metric-label">High priority</div><div class="todo-metric-val" style="color:var(--red)">${high.length}</div></div>
+    </div>
+    <div class="todo-command">
+      <div class="todo-input-wrap">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><line x1="6.5" y1="2" x2="6.5" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="2" y1="6.5" x2="11" y2="6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input class="todo-input" id="todo-quick-title" placeholder="Add a quick to-do..." onkeydown="if(event.key==='Enter')quickAddTodo()" />
+      </div>
+      <select class="todo-client-select" id="todo-quick-client">${todoClientOptions(todoClientFilter==='all'?'':todoClientFilter)}</select>
+      <button class="btn btn-ghost btn-sm" onclick="quickAddTodo()">Add</button>
+    </div>
+    <div class="todo-toolbar">
+      <div class="todo-filter-row">
+        <button class="filter-btn${todoFilter==='open'?' active':''}" onclick="setTodoFilter('open')">Open</button>
+        <button class="filter-btn${todoFilter==='due-soon'?' active':''}" onclick="setTodoFilter('due-soon')">Due soon</button>
+        <button class="filter-btn${todoFilter==='no-date'?' active':''}" onclick="setTodoFilter('no-date')">No date</button>
+        <button class="filter-btn${todoFilter==='completed'?' active':''}" onclick="setTodoFilter('completed')">Completed</button>
+        <button class="filter-btn${todoFilter==='all'?' active':''}" onclick="setTodoFilter('all')">All</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <select class="filter-select" onchange="setTodoPriorityFilter(this.value)">${todoPriorityOptions(todoPriorityFilter)}</select>
+        <select class="filter-select" onchange="setTodoClientFilter(this.value)">${todoClientOptions(todoClientFilter,true)}</select>
+        <input class="search-input" style="width:180px;padding-left:10px" placeholder="Search" value="${esc(todoSearch)}" oninput="setTodoSearch(this.value)"/>
+      </div>
+    </div>
+    <div id="todo-list-wrap">${renderTodoGroups()}</div>
+  </div>`
+}
+function renderTodoGroups(){
+  const list=visibleTodos()
+  if(!list.length)return`<div class="todo-empty"><div class="todo-empty-icon">[]</div><div class="todo-empty-title">No to-dos here</div><div class="todo-empty-sub">Add one above or change the filter.</div></div>`
+  const g=groupTodos(list)
+  const sections=[
+    ['overdue','Overdue',g.overdue],
+    ['today','Today',g.today],
+    ['upcoming','Upcoming',g.upcoming],
+    ['none','No date',g.none],
+    ['completed','Completed',g.completed]
+  ].filter(x=>x[2].length)
+  return sections.map(([key,title,items])=>`<div class="todo-section">
+    <div class="todo-section-head"><div class="todo-section-title">${title}</div><div class="todo-section-count">${items.length}</div></div>
+    <div class="todo-list">${items.map(renderTodoRow).join('')}</div>
+  </div>`).join('')
+}
+function renderTodoRow(t){
+  const c=todoClient(t),st=todoState(t),hasReminder=!!(t.reminderAt&&!t.completedAt)
+  const priority=todoPriority(t)
+  return`<div class="todo-row ${st}">
+    <button class="todo-check${t.completedAt?' done':''}" title="${t.completedAt?'Mark open':'Complete'}" onclick="toggleTodoDone('${t.id}')">${iCheck}</button>
+    <div class="todo-main" onclick="openEditTodo('${t.id}')">
+      <div class="todo-name">${esc(t.title)}</div>
+      ${t.note?`<div class="todo-note-preview">${esc(t.note)}</div>`:''}
+      <div class="todo-meta">
+        <span class="todo-pill priority-${priority}">${esc(todoPriorityLabel(t))}</span>
+        <span class="todo-pill ${st==='overdue'?'overdue':st==='due-today'?'today':''}">${esc(todoDueLabel(t))}</span>
+        ${c?`<span class="todo-pill client" style="border-color:${c.color}55;color:${c.color}">${esc(c.name)}</span>`:''}
+        ${hasReminder?`<span class="todo-pill reminder">Reminder ${esc(fmtTodoDate(t.reminderAt))}</span>`:''}
+      </div>
+    </div>
+    <div class="todo-actions">
+      <button class="ctrl-btn" title="Edit" onclick="openEditTodo('${t.id}')">${iEdit}</button>
+      <button class="ctrl-btn del-btn" title="Delete" onclick="delTodo('${t.id}')">${iDel}</button>
+    </div>
+  </div>`
+}
+function refreshTodoTab(){if(curTab==='todos')renderTodoTab();renderSidebar()}
+function setTodoFilter(v){todoFilter=v;renderTodoTab()}
+function setTodoPriorityFilter(v){todoPriorityFilter=v;renderTodoTab()}
+function setTodoClientFilter(v){todoClientFilter=v;renderTodoTab()}
+function setTodoSearch(v){todoSearch=v;const el=document.getElementById('todo-list-wrap');if(el)el.innerHTML=renderTodoGroups()}
+function quickAddTodo(){
+  const inp=document.getElementById('todo-quick-title');const title=inp?.value?.trim();if(!title)return
+  const cid=document.getElementById('todo-quick-client')?.value||''
+  S.todos.push({id:uid(),title,note:'',priority:'medium',clientId:cid||null,dueAt:null,reminderAt:null,createdAt:Date.now(),completedAt:null,notifiedAt:null})
+  save();renderTodoTab();showToast(`Added "${title}"`)
+}
+function openAddTodo(title=''){
+  editTodo=null
+  document.getElementById('mtodo-title').textContent='New to-do'
+  document.getElementById('inp-todo-title').value=title
+  document.getElementById('inp-todo-client').innerHTML=todoClientOptions(todoClientFilter==='all'?'':todoClientFilter)
+  setTodoPriority('medium')
+  document.getElementById('inp-todo-due').value=''
+  document.getElementById('inp-todo-reminder-enabled').checked=false
+  document.getElementById('inp-todo-reminder').value=''
+  document.getElementById('inp-todo-note').value=''
+  document.getElementById('mtodo-del').style.display='none'
+  toggleTodoReminderField()
+  openModal('modal-todo');setTimeout(()=>document.getElementById('inp-todo-title').focus(),120)
+}
+function openEditTodo(id){
+  editTodo=id
+  const t=(S.todos||[]).find(x=>x.id===id);if(!t)return
+  document.getElementById('mtodo-title').textContent='Edit to-do'
+  document.getElementById('inp-todo-title').value=t.title||''
+  document.getElementById('inp-todo-client').innerHTML=todoClientOptions(t.clientId||'')
+  setTodoPriority(todoPriority(t))
+  document.getElementById('inp-todo-due').value=inputFromTs(t.dueAt)
+  document.getElementById('inp-todo-reminder-enabled').checked=!!t.reminderAt
+  document.getElementById('inp-todo-reminder').value=inputFromTs(t.reminderAt)
+  document.getElementById('inp-todo-note').value=t.note||''
+  document.getElementById('mtodo-del').style.display='inline-block'
+  toggleTodoReminderField()
+  openModal('modal-todo');setTimeout(()=>document.getElementById('inp-todo-title').focus(),120)
+}
+function toggleTodoReminderField(){
+  const on=document.getElementById('inp-todo-reminder-enabled')?.checked
+  const field=document.getElementById('todo-reminder-field')
+  if(field)field.style.display=on?'block':'none'
+  if(on)syncTodoReminderDefault()
+}
+function syncTodoReminderDefault(){
+  const on=document.getElementById('inp-todo-reminder-enabled')?.checked
+  const reminder=document.getElementById('inp-todo-reminder')
+  if(!on||!reminder||reminder.value)return
+  const due=tsFromInput(document.getElementById('inp-todo-due')?.value)
+  reminder.value=inputFromTs(defaultReminderFor(due))
+}
+function saveTodo(){
+  const title=document.getElementById('inp-todo-title').value.trim();if(!title)return
+  const clientId=document.getElementById('inp-todo-client').value||null
+  const priority=getTodoPriority()
+  const dueAt=tsFromInput(document.getElementById('inp-todo-due').value)
+  const reminderOn=document.getElementById('inp-todo-reminder-enabled').checked
+  const reminderAt=reminderOn?(tsFromInput(document.getElementById('inp-todo-reminder').value)||defaultReminderFor(dueAt)):null
+  const note=document.getElementById('inp-todo-note').value.trim()
+  if(editTodo){
+    const t=(S.todos||[]).find(x=>x.id===editTodo);if(!t)return
+    const oldReminder=t.reminderAt
+    t.title=title;t.priority=priority;t.clientId=clientId;t.dueAt=dueAt;t.reminderAt=reminderAt;t.note=note
+    if(oldReminder!==reminderAt)t.notifiedAt=null
+  } else {
+    S.todos.push({id:uid(),title,note,priority,clientId,dueAt,reminderAt,createdAt:Date.now(),completedAt:null,notifiedAt:null})
+  }
+  save();closeModal('modal-todo');refreshTodoTab()
+}
+function toggleTodoDone(id){
+  const t=(S.todos||[]).find(x=>x.id===id);if(!t)return
+  t.completedAt=t.completedAt?null:Date.now()
+  save();refreshTodoTab()
+  showToast(t.completedAt?`Completed "${t.title}"`:`Reopened "${t.title}"`)
+}
+function delTodo(id){
+  const idx=(S.todos||[]).findIndex(t=>t.id===id);if(idx<0)return
+  const snapshot=S.todos[idx]
+  S.todos.splice(idx,1);save();refreshTodoTab()
+  showToast(`Deleted "${snapshot.title}"`,'Undo',()=>{S.todos.splice(idx,0,snapshot);save();refreshTodoTab()})
+}
+function deleteTodoFromModal(){if(!editTodo)return;const id=editTodo;closeModal('modal-todo');delTodo(id)}
+async function notifyTodo(t){
+  const c=todoClient(t)
+  const body=(c?c.name+' - ':'')+(t.dueAt?'Due '+fmtTodoDate(t.dueAt):'Reminder due')
+  let shown=false
+  if(window.electronAPI&&window.electronAPI.showNotification)shown=await window.electronAPI.showNotification({title:t.title,body})
+  if(!shown&&window.Notification){
+    try{
+      if(Notification.permission==='granted'){new Notification(t.title,{body});shown=true}
+      else if(Notification.permission!=='denied'){const p=await Notification.requestPermission();if(p==='granted'){new Notification(t.title,{body});shown=true}}
+    }catch(e){}
+  }
+  if(!shown)showToast(`Reminder: ${t.title}`)
+}
+function checkTodoReminders(){
+  const now=Date.now()
+  if(now-todoReminderCheckAt<30000)return
+  todoReminderCheckAt=now
+  ;(S.todos||[]).forEach(t=>{
+    if(t.completedAt||!t.reminderAt||t.notifiedAt||t.reminderAt>now)return
+    t.notifiedAt=now
+    notifyTodo(t)
+    save()
+  })
+}
+
+// Notes
 function toggleNote(id){
   const t=S.tasks.find(t=>t.id===id);if(!t)return
   t._noteOpen=!t._noteOpen
@@ -1034,6 +1403,12 @@ function renderSidebar(){
   }).join('')
   document.getElementById('total-today').textContent=fmt(todayTotal())
   document.getElementById('total-sub').textContent=`${todayCount()} task${todayCount()===1?'':'s'} logged`
+  const todoOpen=(S.todos||[]).filter(t=>!t.completedAt).length
+  const todoEl=document.getElementById('sidebar-todos')
+  if(todoEl){
+    if(todoOpen>0){todoEl.style.display='block';document.getElementById('total-todos').textContent=todoOpen}
+    else todoEl.style.display='none'
+  }
   // Unbilled total across all stopped + unbilled tasks (any date)
   const unbilled=S.tasks.filter(t=>t.state==='stopped'&&!t.billed).reduce((a,t)=>a+taskTotal(t),0)
   const ubEl=document.getElementById('sidebar-unbilled')
@@ -1337,6 +1712,7 @@ function switchTab(tab){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'))
   document.getElementById('tab-'+tab).classList.add('active')
   if(tab==='today'){renderSidebar();renderMain()}
+  else if(tab==='todos'){renderTodoTab()}
   else if(tab==='summary'){renderSummary()}
   else if(tab==='history')renderHistory()
 }
@@ -1363,8 +1739,10 @@ function onKeydown(e){
     }
   } else if(e.key==='n'||e.key==='N'){
     if(curTab==='today'&&S.selClient){e.preventDefault();openAddTask()}
+    else if(curTab==='todos'){e.preventDefault();openAddTodo()}
   } else if(e.key==='/'){
     if(curTab==='today'){const inp=document.getElementById('search-inp');if(inp){e.preventDefault();inp.focus()}}
+    else if(curTab==='todos'){const inp=document.querySelector('.todo-toolbar .search-input');if(inp){e.preventDefault();inp.focus()}}
     else if(curTab==='history'){const inp=document.getElementById('hist-search-inp');if(inp){e.preventDefault();inp.focus()}}
   }
 }
@@ -1374,6 +1752,7 @@ function handleSystemIdle(reason){
   const rt=runningTask();if(!rt)return
   pauseAll();save()
   if(curTab==='today')renderMain()
+  else if(curTab==='todos')renderTodoTab()
   else if(curTab==='summary')renderSummary()
   else if(curTab==='history')renderHistory()
   renderSidebar()

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, powerMonitor } = require('electron')
+const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, powerMonitor, Notification } = require('electron')
 const path = require('path')
 const fs = require('fs')
 
@@ -111,3 +111,22 @@ ipcMain.handle('save-data', (_, data) => {
   catch (e) { return false }
 })
 ipcMain.handle('update-tray', (_, info) => { updateTray(info); return true })
+ipcMain.handle('show-notification', (_, info) => {
+  try {
+    if (!Notification.isSupported()) return false
+    const notification = new Notification({
+      title: info && info.title ? String(info.title) : 'WorkLog',
+      body: info && info.body ? String(info.body) : ''
+    })
+    notification.on('click', () => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.show()
+        mainWindow.focus()
+      }
+    })
+    notification.show()
+    return true
+  } catch (e) {
+    return false
+  }
+})
